@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BidFlow — Portal do Fornecedor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1e3a5f;--navy-2:#163050;--navy-light:#e8eef7;
+  --bg:#f4f6f9;--bg-2:#fff;--bg-3:#f0f2f5;--bg-4:#e8ecf2;
+  --border:#dde2ea;--text:#1a2133;--text-2:#4a5572;--text-3:#8892a8;
+  --green:#16a34a;--green-light:#dcfce7;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --red:#dc2626;--red-light:#fee2e2;
+  --radius:10px;--radius-lg:14px;--shadow:0 2px 16px rgba(30,58,95,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── TOPBAR ── */
+.pf-topbar{background:var(--navy);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.pf-logo{display:flex;align-items:center;gap:10px;color:#fff}
+.pf-logo-mark{width:30px;height:30px;background:#60a5fa;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff}
+.pf-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:15px}
+.pf-logo-sub{font-size:11px;opacity:.6;margin-left:4px}
+.pf-user{display:flex;align-items:center;gap:10px;color:#fff}
+.pf-user-avatar{width:30px;height:30px;border-radius:50%;background:#2563a8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.pf-user-name{font-size:13px;opacity:.85}
+
+/* ── LAYOUT ── */
+.pf-main{max-width:1100px;margin:0 auto;padding:24px 20px}
+.pf-tabs{display:flex;gap:0;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px;margin-bottom:24px;box-shadow:var(--shadow)}
+.pf-tab{flex:1;text-align:center;padding:9px 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-3);cursor:pointer;transition:all .15s;border:none;background:none;font-family:'DM Sans',sans-serif}
+.pf-tab.active{background:var(--navy);color:#fff}
+.pf-tab-badge{display:inline-block;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:5px}
+.pf-section{display:none}
+.pf-section.active{display:block}
+
+/* ── CARDS ── */
+.pf-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow);margin-bottom:14px}
+.pf-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.pf-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.pf-card-sub{font-size:12px;color:var(--text-3);margin-top:3px}
+
+/* ── COTAÇÃO ABERTA ── */
+.rfq-open-card{background:var(--bg-2);border:1px solid var(--border);border-left:3px solid var(--navy);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.rfq-open-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.rfq-open-id{font-family:monospace;font-size:11px;color:var(--text-3)}
+.rfq-open-title{font-size:15px;font-weight:600;color:var(--text);margin:3px 0 6px}
+.rfq-meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.rfq-meta-item{font-size:12.5px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+.rfq-items-preview{background:var(--bg-3);border-radius:8px;padding:10px 12px;margin-bottom:14px}
+.rfq-item-row-prev{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rfq-item-row-prev:last-child{border-bottom:none}
+.rfq-countdown-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--amber-light);border-radius:8px;margin-bottom:12px;font-size:13px;color:var(--amber);font-weight:500}
+
+/* ── FORMULÁRIO DE PROPOSTA ── */
+.prop-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center}
+.prop-modal-overlay.open{display:flex}
+.prop-modal{background:var(--bg-2);border-radius:var(--radius-lg);width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{transform:translateY(16px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.prop-modal-header{padding:18px 20px;border-bottom:1px solid var(--border);background:var(--navy);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.prop-modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.prop-modal-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px}
+.prop-modal-body{padding:20px}
+.prop-modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-group label{font-size:12px;font-weight:500;color:var(--text-2)}
+.form-input{background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13.5px;outline:none;width:100%;font-family:'DM Sans',sans-serif}
+.form-input:focus{border-color:var(--navy)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px}
+.form-section-title:first-child{border-top:none;padding-top:0}
+.prop-item-row{display:grid;grid-template-columns:1fr 70px 120px;gap:8px;align-items:center;padding:10px 12px;background:var(--bg-3);border-radius:8px;margin-bottom:8px}
+.prop-item-desc{font-size:13px;font-weight:500;color:var(--text)}
+.prop-item-qtd{font-size:12px;color:var(--text-3);text-align:center}
+.prop-item-valor{font-size:13px;font-weight:600;color:var(--navy)}
+.prop-total{text-align:right;font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--navy);padding:12px 0}
+
+/* ── UPLOAD NF ── */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s;color:var(--text-3)}
+.upload-zone:hover{border-color:var(--navy)}
+.upload-zone-icon{font-size:28px;margin-bottom:8px}
+.upload-zone-text{font-size:14px;font-weight:500;color:var(--text-2)}
+.upload-zone-sub{font-size:12px;margin-top:4px}
+.nf-uploaded{background:var(--green-light);border:1px solid rgba(22,163,74,.3);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.nf-uploaded-icon{font-size:22px}
+.nf-uploaded-info{flex:1}
+.nf-uploaded-name{font-size:13.5px;font-weight:500;color:var(--text)}
+.nf-uploaded-sub{font-size:12px;color:var(--text-3)}
+
+/* ── STATUS BADGES ── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
+.badge-green{background:var(--green-light);color:var(--green)}
+.badge-amber{background:var(--amber-light);color:var(--amber)}
+.badge-navy{background:var(--navy-light);color:var(--navy)}
+.badge-gray{background:var(--bg-4);color:var(--text-3)}
+.badge-red{background:var(--red-light);color:var(--red)}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:8px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy-2)}
+.btn-secondary{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg-4)}
+.btn-sm{padding:5px 12px;font-size:12.5px}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#15803d}
+
+/* ── PEDIDOS PENDENTES ── */
+.pedido-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.pedido-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.pedido-id{font-family:monospace;font-size:11px;color:var(--text-3)}
+.pedido-title{font-size:14px;font-weight:600;color:var(--text);margin:3px 0}
+.pedido-valor{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--navy)}
+.tracking-bar{display:flex;margin:12px 0}
+.tracking-step{flex:1;text-align:center;font-size:10px;padding:4px 2px;border-bottom:2px solid var(--bg-4);color:var(--text-3)}
+.tracking-step.done{border-color:var(--green);color:var(--green)}
+.tracking-step.active{border-color:var(--navy);color:var(--navy);font-weight:600}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:15px;font-weight:500;color:var(--text-2);margin-bottom:6px}
+
+/* ── LOGIN ── */
+.pf-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy) 0%,#163050 100%)}
+.login-card{background:#fff;border-radius:20px;padding:36px 40px;width:400px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center}
+.login-logo-mark{width:40px;height:40px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#fff}
+.login-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--navy)}
+
+/* ── CADASTRO ── */
+.cad-steps{display:flex;gap:0;margin-bottom:24px}
+.cad-step{flex:1;text-align:center;padding:10px;font-size:12.5px;font-weight:500;color:var(--text-3);border-bottom:2px solid var(--border)}
+.cad-step.active{color:var(--navy);border-bottom-color:var(--navy)}
+.cad-step.done{color:var(--green);border-bottom-color:var(--green)}
+.cad-step-content{display:none}
+.cad-step-content.active{display:block}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);display:none}
+.toast.show{display:block;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.prop-item-row{grid-template-columns:1fr 60px 100px}.pf-main{padding:16px 12px}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TELA 0: CADASTRO VIA LINK (token na URL)
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-cadastro" style="display:none">
+  <div class="pf-login">
+    <div class="login-card" style="width:520px">
+      <div class="login-logo">
+        <div class="login-logo-mark">B</div>
+        <span class="login-logo-text">BidFlow</span>
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;text-align:center;margin-bottom:4px">Cadastro de Fornecedor</h2>
+      <p style="text-align:center;font-size:13px;color:var(--text-3);margin-bottom:24px">Convite recebido de <strong id="cad-empresa-convidou"></strong></p>
+
+      <!-- Steps -->
+      <div class="cad-steps">
+        <div class="cad-step active" id="cad-step-lbl-1">1. Empresa</div>
+        <div class="cad-step" id="cad-step-lbl-2">2. Contato</div>
+        <div class="cad-step" id="cad-step-lbl-3">3. Banco</div>
+        <div class="cad-step" id="cad-step-lbl-4">4. Documentos</div>
+        <div class="cad-step" id="cad-step-lbl-5">5. Acesso</div>
+      </div>
+
+      <!-- Step 1: Dados empresa -->
+      <div class="cad-step-content active" id="cad-step-1">
+        <div class="form-group"><label>Razão Social *</label><input type="text" class="form-input" id="cad-razao" placeholder="Nome completo da empresa"></div>
+        <div class="form-group"><label>Nome Fantasia</label><input type="text" class="form-input" id="cad-fantasia" placeholder="Nome comercial"></div>
+        <div class="form-row">
+          <div class="form-group"><label>CNPJ *</label><input type="text" class="form-input" id="cad-cnpj" placeholder="00.000.000/0000-00" oninput="maskCNPJ(this)"></div>
+          <div class="form-group"><label>Inscrição Estadual</label><input type="text" class="form-input" id="cad-ie" placeholder="Opcional"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Segmento / Categoria *</label>
+            <select class="form-input" id="cad-cat">
+              <option value="">Selecione...</option>
+              <option>TI & Tecnologia</option><option>MRO</option><option>Serviços</option>
+              <option>Logística</option><option>Material de Escritório</option><option>Equipamentos</option><option>Outros</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Site</label><input type="text" class="form-input" id="cad-site" placeholder="www.empresa.com.br"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: Contato e endereço -->
+      <div class="cad-step-content" id="cad-step-2">
+        <div class="form-row">
+          <div class="form-group"><label>Nome do Contato Comercial *</label><input type="text" class="form-input" id="cad-contato" placeholder="Nome completo"></div>
+          <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="cad-cargo" placeholder="Ex: Gerente Comercial"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>E-mail Comercial *</label><input type="email" class="form-input" id="cad-email" placeholder="comercial@empresa.com.br"></div>
+          <div class="form-group"><label>E-mail para NF *</label><input type="email" class="form-input" id="cad-emailNF" placeholder="fiscal@empresa.com.br"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Telefone</label><input type="text" class="form-input" id="cad-tel" placeholder="(00) 0000-0000"></div>
+          <div class="form-group"><label>Celular / WhatsApp *</label><input type="text" class="form-input" id="cad-cel" placeholder="(00) 00000-0000"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>CEP *</label><input type="text" class="form-input" id="cad-cep" placeholder="00000-000" oninput="buscaCEP(this)"></div>
+          <div class="form-group"><label>UF</label><input type="text" class="form-input" id="cad-uf" placeholder="SP" maxlength="2"></div>
+        </div>
+        <div class="form-group"><label>Endereço *</label><input type="text" class="form-input" id="cad-end" placeholder="Logradouro, número, complemento"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Bairro</label><input type="text" class="form-input" id="cad-bairro"></div>
+          <div class="form-group"><label>Cidade *</label><input type="text" class="form-input" id="cad-cidade"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Dados bancários -->
+      <div class="cad-step-content" id="cad-step-3">
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:16px">Dados utilizados para pagamentos. Mínimo um campo obrigatório.</p>
+        <div class="form-row">
+          <div class="form-group"><label>Banco</label><input type="text" class="form-input" id="cad-banco" placeholder="Nome do banco"></div>
+          <div class="form-group"><label>Agência</label><input type="text" class="form-input" id="cad-agencia" placeholder="0000"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Conta Corrente</label><input type="text" class="form-input" id="cad-conta" placeholder="00000-0"></div>
+          <div class="form-group"><label>Tipo de Conta</label>
+            <select class="form-input" id="cad-tipoconta"><option>Corrente</option><option>Poupança</option><option>PJ</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Chave PIX</label><input type="text" class="form-input" id="cad-pix" placeholder="CNPJ, e-mail, telefone ou chave aleatória"></div>
+      </div>
+
+      <!-- Step 4: Documentos -->
+      <div class="cad-step-content" id="cad-step-4">
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:16px">Faça upload dos documentos de homologação. O time de compras irá validar cada documento.</p>
+        <div id="cad-docs-list">
+          <div class="form-group">
+            <label>Contrato Social / Requerimento de Empresário *</label>
+            <input type="file" class="form-input" accept=".pdf,.jpg,.png" onchange="docUploaded(this,'doc-cs')">
+            <span id="doc-cs" style="font-size:11.5px;color:var(--text-3)"></span>
+          </div>
+          <div class="form-group">
+            <label>Certidão Negativa de Débitos Federais</label>
+            <input type="file" class="form-input" accept=".pdf" onchange="docUploaded(this,'doc-cnd')">
+            <span id="doc-cnd" style="font-size:11.5px;color:var(--text-3)"></span>
+          </div>
+          <div class="form-group">
+            <label>Alvará de Funcionamento</label>
+            <input type="file" class="form-input" accept=".pdf,.jpg,.png" onchange="docUploaded(this,'doc-alv')">
+            <span id="doc-alv" style="font-size:11.5px;color:var(--text-3)"></span>
+          </div>
+          <div class="form-group">
+            <label>Certidão de Regularidade FGTS</label>
+            <input type="file" class="form-input" accept=".pdf" onchange="docUploaded(this,'doc-fgts')">
+            <span id="doc-fgts" style="font-size:11.5px;color:var(--text-3)"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Criar acesso ao portal -->
+      <div class="cad-step-content" id="cad-step-5">
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:16px">Crie sua senha de acesso ao portal do fornecedor BidFlow.</p>
+        <div class="form-group"><label>E-mail de acesso (login)</label>
+          <input type="email" class="form-input" id="cad-loginEmail" placeholder="Preenchido automaticamente" readonly></div>
+        <div class="form-group"><label>Senha *</label>
+          <input type="password" class="form-input" id="cad-senha" placeholder="Mínimo 8 caracteres"></div>
+        <div class="form-group"><label>Confirmar Senha *</label>
+          <input type="password" class="form-input" id="cad-senhaConf" placeholder="Repita a senha"></div>
+        <div style="background:var(--navy-light);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--navy);margin-top:8px">
+          ✅ Após o cadastro, seus dados serão enviados automaticamente para análise.<br>
+          Você receberá um e-mail de confirmação em até 2 dias úteis.
+        </div>
+      </div>
+
+      <!-- Footer buttons -->
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+        <button class="btn btn-secondary" id="cad-btn-back" onclick="cadStepPrev()" style="display:none">← Voltar</button>
+        <button class="btn btn-primary" id="cad-btn-next" onclick="cadStepNext()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TELA 1: LOGIN DO FORNECEDOR
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-login" style="display:none">
+  <div class="pf-login">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-mark">B</div>
+        <span class="login-logo-text">BidFlow</span>
+      </div>
+      <p style="text-align:center;font-size:13px;color:var(--text-3);margin-bottom:24px">Portal do Fornecedor</p>
+      <div class="form-group"><label>E-mail</label><input type="email" class="form-input" id="login-email" placeholder="seu@email.com.br" value="vendas@techsupply.com.br"></div>
+      <div class="form-group"><label>Senha</label><input type="password" class="form-input" id="login-senha" placeholder="Sua senha" value="123456"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="fazerLogin()">Entrar no Portal</button>
+      <div style="text-align:center;margin-top:14px;font-size:12.5px;color:var(--text-3)">
+        Não tem acesso? <a href="#" onclick="solicitarCadastro()" style="color:var(--navy)">Solicitar cadastro</a>
+      </div>
+      <!-- Demo shortcut -->
+      <div style="margin-top:20px;padding:12px;background:var(--bg-3);border-radius:8px;font-size:12px;color:var(--text-3);text-align:center">
+        🎯 Demo: e-mail e senha já preenchidos. Clique em Entrar.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TELA 2: PORTAL DO FORNECEDOR (autenticado)
+══════════════════════════════════════════════════════════════ -->
+<div id="screen-portal" style="display:none">
+  <nav class="pf-topbar">
+    <div class="pf-logo">
+      <div class="pf-logo-mark">B</div>
+      <span class="pf-logo-text">BidFlow</span>
+      <span class="pf-logo-sub">Portal do Fornecedor</span>
+    </div>
+    <div class="pf-user">
+      <div class="pf-user-avatar" id="pf-user-avatar">TS</div>
+      <span class="pf-user-name" id="pf-user-name">TechSupply LTDA</span>
+      <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="fazerLogout()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="pf-main">
+    <!-- Header boas-vindas -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700" id="pf-welcome">Bem-vindo, TechSupply!</h1>
+      <p style="font-size:13.5px;color:var(--text-3);margin-top:3px" id="pf-welcome-sub"></p>
+    </div>
+
+    <!-- KPIs rápidos -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px" id="pf-kpis"></div>
+
+    <!-- Tabs -->
+    <div class="pf-tabs">
+      <button class="pf-tab active" onclick="pfTab('cotacoes')">
+        Cotações em Aberto <span class="pf-tab-badge" id="tab-badge-cot">0</span>
+      </button>
+      <button class="pf-tab" onclick="pfTab('pedidos')">Pedidos / Entregas</button>
+      <button class="pf-tab" onclick="pfTab('nfs')">Notas Fiscais</button>
+      <button class="pf-tab" onclick="pfTab('historico')">Histórico</button>
+      <button class="pf-tab" onclick="pfTab('perfil')">Meu Cadastro</button>
+    </div>
+
+    <!-- ── COTAÇÕES EM ABERTO ── -->
+    <div class="pf-section active" id="pf-sec-cotacoes">
+      <div id="cotacoes-list"></div>
+    </div>
+
+    <!-- ── PEDIDOS / ENTREGAS ── -->
+    <div class="pf-section" id="pf-sec-pedidos">
+      <div id="pedidos-list"></div>
+    </div>
+
+    <!-- ── NOTAS FISCAIS ── -->
+    <div class="pf-section" id="pf-sec-nfs">
+      <div style="margin-bottom:16px;font-size:13.5px;color:var(--text-2)">
+        Faça upload das notas fiscais referentes aos pedidos recebidos.<br>
+        O time de compras irá conciliar automaticamente com o pedido de compra.
+      </div>
+      <div id="nf-upload-list"></div>
+    </div>
+
+    <!-- ── HISTÓRICO ── -->
+    <div class="pf-section" id="pf-sec-historico">
+      <div class="pf-card">
+        <div class="pf-card-header"><div class="pf-card-title">Cotações Respondidas</div></div>
+        <div id="historico-list"></div>
+      </div>
+    </div>
+
+    <!-- ── PERFIL ── -->
+    <div class="pf-section" id="pf-sec-perfil">
+      <div id="perfil-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ENVIAR PROPOSTA ══ -->
+<div class="prop-modal-overlay" id="propModal">
+  <div class="prop-modal">
+    <div class="prop-modal-header">
+      <div class="prop-modal-title" id="prop-modal-rfq-titulo">Enviar Proposta</div>
+      <div class="prop-modal-sub" id="prop-modal-rfq-id"></div>
+    </div>
+    <div class="prop-modal-body" id="prop-modal-body"></div>
+    <div class="prop-modal-footer">
+      <button class="btn btn-secondary" onclick="closePropModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitProposta()">✓ Enviar Proposta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: UPLOAD NF ══ -->
+<div class="prop-modal-overlay" id="nfModal">
+  <div class="prop-modal" style="width:500px">
+    <div class="prop-modal-header">
+      <div class="prop-modal-title">Upload de Nota Fiscal</div>
+      <div class="prop-modal-sub" id="nf-modal-pedido"></div>
+    </div>
+    <div class="prop-modal-body" id="nf-modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Número da NF *</label><input type="text" class="form-input" id="nf-numero" placeholder="Ex: 4523"></div>
+        <div class="form-group"><label>Valor da NF (R$) *</label><input type="number" class="form-input" id="nf-valor" placeholder="0,00" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Data de Emissão *</label><input type="date" class="form-input" id="nf-data"></div>
+        <div class="form-group"><label>Chave NF-e (44 dígitos)</label><input type="text" class="form-input" id="nf-chave" placeholder="Opcional"></div>
+      </div>
+      <div class="form-group"><label>Arquivo da NF *</label>
+        <div class="upload-zone" onclick="document.getElementById('nf-arquivo').click()">
+          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-text">Clique ou arraste o XML / PDF da NF-e</div>
+          <div class="upload-zone-sub">XML preferencial · PDF aceito · max 10MB</div>
+        </div>
+        <input type="file" id="nf-arquivo" accept=".xml,.pdf" style="display:none" onchange="nfArquivoSelecionado(this)">
+        <div id="nf-arquivo-preview" style="display:none"></div>
+      </div>
+      <div style="background:var(--navy-light);border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--navy)">
+        ℹ️ Após o upload, o time de compras irá conciliar a NF com o pedido de compra.<br>
+        Você será notificado por e-mail sobre o resultado da conciliação.
+      </div>
+    </div>
+    <div class="prop-modal-footer">
+      <button class="btn btn-secondary" onclick="closeNfModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitNF()">Enviar Nota Fiscal</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── SCRIPTS ── -->
+<script>
+// ─── Inline mock DB (em produção: importar db.js) ────────────────
+const SESS = { fornecedorId: null, fornecedor: null };
+
+const FORNECEDORES_MOCK = {
+  'F001': {
+    id:'F001', sigla:'TS', nome:'TechSupply LTDA', cnpj:'12.345.678/0001-90',
+    email:'vendas@techsupply.com.br', contato:'Pedro Henrique', cargo:'Gerente Comercial',
+    telefone:'(11) 3333-4444', celular:'(11) 99999-1111',
+    categoria:'TI & Tecnologia', status:'Aprovado',
+    banco:'Itaú', agencia:'1234', conta:'56789-0', pix:'12345678000190',
+    cidade:'São Paulo', uf:'SP',
+  }
+};
+
+const RFQS_FORNECEDOR = {
+  'F001': [
+    {
+      id:'RFQ-2024-0891', titulo:'Notebooks e Periféricos TI',
+      empresa:'Razzo Indústria', prazo:'20/03/2026 18:00', vence:'2026-03-20T18:00',
+      status:'Aguardando resposta', valorRef:45000,
+      observacoes:'Garantia mínima 12 meses. Entrega em até 15 dias úteis. Informar prazo exato de entrega.',
+      itens:[
+        { id:1, desc:'Notebook Dell i7 16GB 512SSD',qtd:10,unid:'UN',valorRef:7000 },
+        { id:2, desc:'Mouse sem fio Logitech M330',  qtd:20,unid:'UN',valorRef:95   },
+        { id:3, desc:'Monitor 27" 4K LG UHD',        qtd:5, unid:'UN',valorRef:2200 },
+      ],
+    },
+  ],
+  'F001_historico': [
+    { id:'RFQ-2024-0880', titulo:'Impressoras HP A4', empresa:'Razzo', status:'Vencedor', valorProposta:6800, data:'14/03/2026' },
+    { id:'RFQ-2024-0870', titulo:'Suprimentos TI Q1', empresa:'Razzo', status:'Não vencedor', valorProposta:22400, data:'01/03/2026' },
+  ],
+};
+
+const PEDIDOS_FORNECEDOR = {
+  'F001': [
+    { id:'PC-2024-1095', titulo:'Impressoras HP A4', valor:6800, status:'Recebido',
+      previsaoEntrega:'14/03/2026', emissao:'10/03/2026',
+      itens:[{desc:'Impressora HP LaserJet Pro M404n',qtd:2,valor:3200},{desc:'Toner HP CF259A',qtd:4,valor:250}],
+      nf: { enviada:true, numero:'NF-4520', status:'Conciliada' } },
+    { id:'PC-2024-1099', titulo:'Cabos e Conectores', valor:3100, status:'Transito',
+      previsaoEntrega:'18/03/2026', emissao:'14/03/2026',
+      itens:[{desc:'Cabo HDMI 2m',qtd:20,valor:45},{desc:'Adaptador USB-C',qtd:30,valor:65}],
+      nf: { enviada:false } },
+    { id:'PC-2024-1102', titulo:'Licenças Microsoft 365', valor:24000, status:'Aprovado',
+      previsaoEntrega:'25/03/2026', emissao:'15/03/2026',
+      itens:[{desc:'Microsoft 365 Business (50 licenças)',qtd:50,valor:480}],
+      nf: { enviada:false } },
+  ]
+};
+
+// ─── Formatters ──────────────────────────────────────────────────
+const brl  = v => 'R$ ' + Number(v).toLocaleString('pt-BR');
+const brlF = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+// ─── Toast ───────────────────────────────────────────────────────
+function toast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ─── Routing inicial ─────────────────────────────────────────────
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+  const rfqTok = params.get('rfq');
+  const action = params.get('action');
+
+  // Link de cadastro via convite
+  if (token && token.startsWith('invite_')) {
+    document.getElementById('screen-cadastro').style.display = 'block';
+    document.getElementById('cad-empresa-convidou').textContent = 'Razzo Indústria';
+    return;
+  }
+
+  // Link direto para responder cotação
+  if (token && rfqTok) {
+    const fornId = token.includes('F001') ? 'F001' : 'F001';
+    loginComToken(fornId, rfqTok);
+    return;
+  }
+
+  // Padrão: tela de login
+  document.getElementById('screen-login').style.display = 'block';
+}
+
+// ─── Login ───────────────────────────────────────────────────────
+function fazerLogin() {
+  const email = document.getElementById('login-email').value;
+  // Mock: qualquer senha loga como TechSupply
+  const forn = Object.values(FORNECEDORES_MOCK).find(f => f.email === email) || FORNECEDORES_MOCK['F001'];
+  loginComToken(forn.id, null);
+}
+
+function loginComToken(fornId, rfqFoco) {
+  SESS.fornecedorId = fornId;
+  SESS.fornecedor   = FORNECEDORES_MOCK[fornId];
+  SESS.rfqFoco      = rfqFoco;
+  document.getElementById('screen-login').style.display  = 'none';
+  document.getElementById('screen-portal').style.display = 'block';
+  renderPortal();
+  if (rfqFoco) { pfTab('cotacoes'); }
+}
+
+function fazerLogout() {
+  SESS.fornecedorId = null; SESS.fornecedor = null;
+  document.getElementById('screen-portal').style.display = 'none';
+  document.getElementById('screen-login').style.display  = 'block';
+}
+
+// ─── Portal principal ────────────────────────────────────────────
+function renderPortal() {
+  const f = SESS.fornecedor;
+  const rfqs    = RFQS_FORNECEDOR[f.id] || [];
+  const pedidos = PEDIDOS_FORNECEDOR[f.id] || [];
+  const nfsPend = pedidos.filter(p => !p.nf.enviada && p.status !== 'Recebido');
+
+  document.getElementById('pf-user-avatar').textContent = f.sigla;
+  document.getElementById('pf-user-name').textContent   = f.nome;
+  document.getElementById('pf-welcome').textContent     = 'Bem-vindo, ' + f.nome + '!';
+  document.getElementById('pf-welcome-sub').textContent = 'Aqui estão suas cotações e pedidos em aberto — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('tab-badge-cot').textContent  = rfqs.length;
+
+  // KPIs
+  document.getElementById('pf-kpis').innerHTML = [
+    { label:'Cotações abertas',     val: rfqs.length,              cor:'#1e3a5f' },
+    { label:'Pedidos em andamento', val: pedidos.filter(p=>p.status!=='Recebido').length, cor:'#2563a8' },
+    { label:'NFs pendentes',        val: nfsPend.length,           cor:'#d97706' },
+    { label:'Total faturado',       val: brl(pedidos.reduce((s,p)=>s+p.valor,0)), cor:'#16a34a' },
+  ].map(k=>`
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-top:3px solid ${k.cor}">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text)">${k.val}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:3px">${k.label}</div>
+    </div>`).join('');
+
+  renderCotacoes();
+  renderPedidos();
+  renderNFs();
+  renderHistorico();
+  renderPerfil();
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────
+function pfTab(tab) {
+  document.querySelectorAll('.pf-tab').forEach((t,i)=>{
+    const tabs=['cotacoes','pedidos','nfs','historico','perfil'];
+    t.classList.toggle('active', tabs[i]===tab);
+  });
+  document.querySelectorAll('.pf-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('pf-sec-'+tab).classList.add('active');
+}
+
+// ─── Cotações em aberto ───────────────────────────────────────────
+function renderCotacoes() {
+  const rfqs = RFQS_FORNECEDOR[SESS.fornecedorId] || [];
+  const el   = document.getElementById('cotacoes-list');
+
+  if (!rfqs.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma cotação em aberto</div><p>Você receberá um e-mail quando uma nova cotação for enviada.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = rfqs.map(r => {
+    const diff = new Date(r.vence) - new Date();
+    const horas = Math.floor(diff / 3600000);
+    const dias  = Math.floor(diff / 86400000);
+    const urgente = diff > 0 && dias < 1;
+    const expirado = diff <= 0;
+    const countdownLabel = expirado ? '⏰ Prazo encerrado' : dias >= 1 ? `⏱ ${dias} dia${dias>1?'s':''} restante${dias>1?'s':''}` : `⚡ ${horas}h restantes`;
+
+    return `
+    <div class="rfq-open-card" id="rfq-card-${r.id}">
+      <div class="rfq-open-header">
+        <div>
+          <div class="rfq-open-id">${r.id} · ${r.empresa}</div>
+          <div class="rfq-open-title">${r.titulo}</div>
+        </div>
+        <span class="badge ${expirado?'badge-gray':urgente?'badge-amber':'badge-navy'}">${urgente||expirado?countdownLabel:'Em aberto'}</span>
+      </div>
+      ${(urgente||expirado)?`<div class="rfq-countdown-bar">⚠ ${countdownLabel} — ${expirado?'Entre em contato com o comprador.':'Envie sua proposta o quanto antes!'}</div>`:''}
+      <div class="rfq-meta-row">
+        <span class="rfq-meta-item">📅 Prazo: <strong>${r.prazo}</strong></span>
+        <span class="rfq-meta-item">📦 ${r.itens.length} ite${r.itens.length>1?'ns':'m'}</span>
+        <span class="rfq-meta-item">💰 Ref: ${brl(r.valorRef)}</span>
+      </div>
+      <div class="rfq-items-preview">
+        ${r.itens.map(i=>`
+        <div class="rfq-item-row-prev">
+          <span>${i.desc}</span>
+          <span style="color:var(--text-3)">${i.qtd} ${i.unid}</span>
+          <span style="font-weight:600;color:var(--navy)">${brl(i.valorRef * i.qtd)}</span>
+        </div>`).join('')}
+      </div>
+      ${r.observacoes?`<div style="font-size:12.5px;color:var(--text-3);margin-bottom:12px;padding:8px 12px;background:var(--bg-3);border-radius:6px">📌 ${r.observacoes}</div>`:''}
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        ${!expirado?`<button class="btn btn-primary" onclick="abrirProposta('${r.id}')">✏ Enviar Proposta</button>`:''}
+        <button class="btn btn-secondary" onclick="toast('Download do edital em breve')">📄 Baixar Edital</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Modal enviar proposta ─────────────────────────────────────────
+let propRFQAtual = null;
+function abrirProposta(rfqId) {
+  const rfq = (RFQS_FORNECEDOR[SESS.fornecedorId]||[]).find(r=>r.id===rfqId);
+  if (!rfq) return;
+  propRFQAtual = rfq;
+
+  document.getElementById('prop-modal-rfq-titulo').textContent = rfq.titulo;
+  document.getElementById('prop-modal-rfq-id').textContent     = rfq.id + ' · Prazo: ' + rfq.prazo;
+
+  document.getElementById('prop-modal-body').innerHTML = `
+    <div class="form-section-title">Preços por Item</div>
+    <div id="prop-itens">
+      ${rfq.itens.map(i=>`
+      <div class="prop-item-row" id="pi-row-${i.id}">
+        <div>
+          <div class="prop-item-desc">${i.desc}</div>
+          <div style="font-size:11.5px;color:var(--text-3)">${i.qtd} ${i.unid} · Ref: ${brl(i.valorRef)}/un</div>
+        </div>
+        <input type="number" class="form-input" id="pi-val-${i.id}" placeholder="R$ unit." step="0.01"
+               style="font-size:13px;text-align:right" oninput="calcPropTotal()" value="${i.valorRef}">
+        <div class="prop-item-valor" id="pi-total-${i.id}">${brlF(i.valorRef*i.qtd)}</div>
+      </div>`).join('')}
+    </div>
+    <div class="prop-total">Total: <span id="prop-total-val">${brlF(rfq.itens.reduce((s,i)=>s+i.valorRef*i.qtd,0))}</span></div>
+
+    <div class="form-section-title">Condições Comerciais</div>
+    <div class="form-row">
+      <div class="form-group"><label>Prazo de Entrega *</label>
+        <input type="text" class="form-input" id="pi-prazo" placeholder="Ex: 10 dias úteis"></div>
+      <div class="form-group"><label>Condição de Pagamento *</label>
+        <select class="form-input" id="pi-pagto">
+          <option>À vista</option><option>7 ddl</option><option>14 ddl</option>
+          <option selected>28 ddl</option><option>30 ddl</option><option>45 ddl</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Frete</label>
+        <select class="form-input" id="pi-frete">
+          <option>Incluso no preço</option><option>A combinar</option><option>CIF</option><option>FOB</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Garantia</label>
+        <input type="text" class="form-input" id="pi-garantia" placeholder="Ex: 12 meses"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Validade da Proposta *</label>
+        <input type="date" class="form-input" id="pi-validade"></div>
+      <div class="form-group"><label>Observações</label>
+        <input type="text" class="form-input" id="pi-obs" placeholder="Informações adicionais"></div>
+    </div>`;
+
+  // Set default validade = hoje + 15 dias
+  const v = new Date(); v.setDate(v.getDate()+15);
+  document.getElementById('pi-validade').value = v.toISOString().split('T')[0];
+
+  document.getElementById('propModal').classList.add('open');
+}
+
+function calcPropTotal() {
+  if (!propRFQAtual) return;
+  let total = 0;
+  propRFQAtual.itens.forEach(i => {
+    const val  = parseFloat(document.getElementById('pi-val-'+i.id)?.value)||0;
+    const sub  = val * i.qtd;
+    total += sub;
+    const el = document.getElementById('pi-total-'+i.id);
+    if (el) el.textContent = brlF(sub);
+  });
+  const el = document.getElementById('prop-total-val');
+  if (el) el.textContent = brlF(total);
+}
+
+function closePropModal() {
+  document.getElementById('propModal').classList.remove('open');
+  propRFQAtual = null;
+}
+
+function submitProposta() {
+  if (!propRFQAtual) return;
+  const prazo   = document.getElementById('pi-prazo')?.value?.trim();
+  const validade= document.getElementById('pi-validade')?.value;
+  if (!prazo)    { toast('Informe o prazo de entrega'); return; }
+  if (!validade) { toast('Informe a validade da proposta'); return; }
+
+  const itens = propRFQAtual.itens.map(i=>({
+    id: i.id,
+    valor: parseFloat(document.getElementById('pi-val-'+i.id)?.value)||0,
+    obs: '',
+  }));
+  const proposta = {
+    fornId:   SESS.fornecedorId,
+    fornNome: SESS.fornecedor.nome,
+    recebida: new Date().toLocaleString('pt-BR'),
+    validade: new Date(validade).toLocaleDateString('pt-BR'),
+    prazoEntrega: prazo,
+    condicaoPagto: document.getElementById('pi-pagto')?.value,
+    frete:    document.getElementById('pi-frete')?.value,
+    garantia: document.getElementById('pi-garantia')?.value,
+    obs:      document.getElementById('pi-obs')?.value,
+    itens,
+  };
+
+  // Em produção: POST para backend BidFlow -> atualiza MOCK_DB.rfqs
+  console.log('[BidFlow] Proposta enviada:', proposta);
+  // Simular recebimento no portal
+  window.dispatchEvent(new CustomEvent('propostaEnviada', { detail: { rfqId: propRFQAtual.id, proposta } }));
+
+  // Remover da lista de abertas e mover para histórico
+  const idx = (RFQS_FORNECEDOR[SESS.fornecedorId]||[]).findIndex(r=>r.id===propRFQAtual.id);
+  if (idx > -1) RFQS_FORNECEDOR[SESS.fornecedorId].splice(idx, 1);
+  const hist = RFQS_FORNECEDOR[SESS.fornecedorId+'_historico'] || [];
+  hist.unshift({ id:propRFQAtual.id, titulo:propRFQAtual.titulo, empresa:propRFQAtual.empresa, status:'Proposta enviada', valorProposta: itens.reduce((s,i)=>{ const it=propRFQAtual.itens.find(x=>x.id===i.id); return s+i.valor*(it?it.qtd:1); },0), data:new Date().toLocaleDateString('pt-BR') });
+  RFQS_FORNECEDOR[SESS.fornecedorId+'_historico'] = hist;
+
+  closePropModal();
+  toast('✓ Proposta enviada com sucesso! O comprador será notificado.');
+  renderPortal();
+  document.getElementById('tab-badge-cot').textContent = (RFQS_FORNECEDOR[SESS.fornecedorId]||[]).length;
+}
+
+// ─── Pedidos / Entregas ────────────────────────────────────────────
+function renderPedidos() {
+  const pedidos = PEDIDOS_FORNECEDOR[SESS.fornecedorId] || [];
+  const el = document.getElementById('pedidos-list');
+  if (!pedidos.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-text">Nenhum pedido de compra</div></div>`;
+    return;
+  }
+  const stCls = { Aprovado:'badge-navy', Transito:'badge-amber', Recebido:'badge-green', Aprovacao:'badge-gray' };
+  const stTrack = { Aprovado:1, Transito:2, Recebido:3 };
+  el.innerHTML = pedidos.map(p=>{
+    const steps = ['Pedido emitido','Aceite fornecedor','Em trânsito','Entregue'];
+    const cur   = stTrack[p.status]||0;
+    return `
+    <div class="pedido-card">
+      <div class="pedido-header">
+        <div>
+          <div class="pedido-id">${p.id} · Emitido: ${p.emissao}</div>
+          <div class="pedido-title">${p.titulo}</div>
+          <div style="font-size:12.5px;color:var(--text-3);margin-top:3px">Previsão de entrega: <strong>${p.previsaoEntrega}</strong></div>
+        </div>
+        <div style="text-align:right">
+          <div class="pedido-valor">${brlF(p.valor)}</div>
+          <span class="badge ${stCls[p.status]||'badge-gray'}" style="margin-top:6px;display:inline-block">${p.status}</span>
+        </div>
+      </div>
+      <div class="tracking-bar">
+        ${steps.map((s,i)=>`<div class="tracking-step ${i<cur?'done':i===cur?'active':''}">${s}</div>`).join('')}
+      </div>
+      <div style="font-size:13px;color:var(--text-3);margin:10px 0 4px">Itens:</div>
+      <div style="background:var(--bg-3);border-radius:8px;padding:8px 12px">
+        ${p.itens.map(i=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px;border-bottom:1px solid var(--border)"><span>${i.desc} × ${i.qtd}</span><span style="font-weight:600">${brlF(i.valor*i.qtd)}</span></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+        ${!p.nf.enviada && p.status !== 'Aprovacao'
+          ? `<button class="btn btn-primary btn-sm" onclick="abrirNFModal('${p.id}')">📄 Enviar Nota Fiscal</button>`
+          : p.nf.enviada ? `<span style="font-size:13px;color:var(--green)">✓ NF ${p.nf.numero} enviada — ${p.nf.status}</span>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="toast('Confirmação de entrega registrada!')">✓ Confirmar Entrega</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── NF Upload ─────────────────────────────────────────────────────
+let nfPedidoAtual = null;
+function renderNFs() {
+  const pedidos = (PEDIDOS_FORNECEDOR[SESS.fornecedorId]||[]).filter(p=>p.status!=='Aprovacao');
+  const el = document.getElementById('nf-upload-list');
+  el.innerHTML = pedidos.map(p=>`
+    <div class="pf-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div style="font-family:monospace;font-size:11px;color:var(--text-3)">${p.id}</div>
+          <div style="font-size:14px;font-weight:600">${p.titulo}</div>
+          <div style="font-size:12.5px;color:var(--text-3)">${brlF(p.valor)}</div>
+        </div>
+        ${p.nf.enviada
+          ? `<div class="nf-uploaded"><div class="nf-uploaded-icon">✅</div><div class="nf-uploaded-info"><div class="nf-uploaded-name">NF ${p.nf.numero}</div><div class="nf-uploaded-sub">${p.nf.status}</div></div></div>`
+          : `<button class="btn btn-primary" onclick="abrirNFModal('${p.id}')">📄 Enviar NF</button>`}
+      </div>
+    </div>`).join('');
+  if (!pedidos.length) el.innerHTML = `<div class="empty-state"><div class="empty-icon">📄</div><div class="empty-text">Nenhum pedido pendente de NF</div></div>`;
+}
+
+function abrirNFModal(pedidoId) {
+  nfPedidoAtual = pedidoId;
+  document.getElementById('nf-modal-pedido').textContent = pedidoId;
+  document.getElementById('nf-modal-body').style.display = 'block';
+  document.getElementById('nfModal').classList.add('open');
+}
+
+function closeNfModal() {
+  document.getElementById('nfModal').classList.remove('open');
+  nfPedidoAtual = null;
+}
+
+function nfArquivoSelecionado(input) {
+  const f = input.files[0]; if (!f) return;
+  document.getElementById('nf-arquivo-preview').style.display = 'block';
+  document.getElementById('nf-arquivo-preview').innerHTML = `
+    <div class="nf-uploaded" style="margin-top:8px">
+      <div class="nf-uploaded-icon">📄</div>
+      <div class="nf-uploaded-info"><div class="nf-uploaded-name">${f.name}</div><div class="nf-uploaded-sub">${(f.size/1024).toFixed(1)} KB</div></div>
+    </div>`;
+}
+
+function submitNF() {
+  const num   = document.getElementById('nf-numero')?.value?.trim();
+  const valor = document.getElementById('nf-valor')?.value;
+  const data  = document.getElementById('nf-data')?.value;
+  if (!num)   { toast('Informe o número da NF'); return; }
+  if (!valor) { toast('Informe o valor da NF'); return; }
+  if (!data)  { toast('Informe a data de emissão'); return; }
+
+  // Atualiza pedido local
+  const p = (PEDIDOS_FORNECEDOR[SESS.fornecedorId]||[]).find(x=>x.id===nfPedidoAtual);
+  if (p) { p.nf = { enviada:true, numero:'NF-'+num, status:'Aguardando conciliação' }; }
+
+  // Em produção: POST para backend BidFlow -> MOCK_DB.notasFiscais
+  console.log('[BidFlow] NF enviada:', { pedidoId:nfPedidoAtual, numero:num, valor, data });
+
+  closeNfModal();
+  toast('✓ Nota Fiscal enviada! Aguarde a conciliação pelo time de compras.');
+  renderPortal();
+}
+
+// ─── Histórico ────────────────────────────────────────────────────
+function renderHistorico() {
+  const hist = RFQS_FORNECEDOR[SESS.fornecedorId+'_historico'] || [];
+  const el   = document.getElementById('historico-list');
+  if (!hist.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3)">Nenhum histórico ainda.</div>';
+    return;
+  }
+  const stCls = { 'Vencedor':'badge-green', 'Proposta enviada':'badge-navy', 'Não vencedor':'badge-gray' };
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse">
+    <thead><tr style="background:var(--bg-3)">
+      <th style="padding:10px 12px;text-align:left;font-size:11px;color:var(--text-3)">RFQ</th>
+      <th style="padding:10px 12px;text-align:left;font-size:11px;color:var(--text-3)">Título</th>
+      <th style="padding:10px 12px;text-align:right;font-size:11px;color:var(--text-3)">Valor Proposta</th>
+      <th style="padding:10px 12px;text-align:center;font-size:11px;color:var(--text-3)">Status</th>
+      <th style="padding:10px 12px;text-align:right;font-size:11px;color:var(--text-3)">Data</th>
+    </tr></thead>
+    <tbody>
+      ${hist.map(h=>`<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:10px 12px;font-family:monospace;font-size:11.5px;color:var(--text-3)">${h.id}</td>
+        <td style="padding:10px 12px;font-size:13.5px;font-weight:500">${h.titulo}</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:600;color:var(--navy)">${brlF(h.valorProposta)}</td>
+        <td style="padding:10px 12px;text-align:center"><span class="badge ${stCls[h.status]||'badge-gray'}">${h.status}</span></td>
+        <td style="padding:10px 12px;text-align:right;color:var(--text-3);font-size:12.5px">${h.data}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ─── Perfil ────────────────────────────────────────────────────────
+function renderPerfil() {
+  const f = SESS.fornecedor; if (!f) return;
+  document.getElementById('perfil-content').innerHTML = `
+    <div class="pf-card">
+      <div class="pf-card-header">
+        <div class="pf-card-title">Dados do Cadastro</div>
+        <button class="btn btn-secondary btn-sm" onclick="toast('Edição de cadastro disponível em breve')">Solicitar Alteração</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        ${[
+          ['Razão Social', f.nome], ['CNPJ', f.cnpj],
+          ['Contato', f.contato], ['Cargo', f.cargo],
+          ['E-mail Comercial', f.email], ['Celular', f.celular],
+          ['Banco', f.banco], ['Chave PIX', f.pix],
+          ['Categoria', f.categoria], ['Status', f.status],
+        ].map(([l,v])=>`<div><div style="font-size:11px;color:var(--text-3)">${l}</div><div style="font-size:13.5px;font-weight:500;margin-top:2px">${v||'—'}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="pf-card" style="margin-top:14px">
+      <div class="pf-card-header"><div class="pf-card-title">Alterar Senha</div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Senha Atual</label><input type="password" class="form-input" placeholder="••••••••"></div>
+        <div class="form-group"><label>Nova Senha</label><input type="password" class="form-input" placeholder="••••••••"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="toast('Senha alterada com sucesso!')">Salvar Nova Senha</button>
+    </div>`;
+}
+
+// ─── Cadastro steps ───────────────────────────────────────────────
+let cadStep = 1;
+function cadStepNext() {
+  if (cadStep === 1) {
+    if (!document.getElementById('cad-razao')?.value.trim()) { toast('Informe a Razão Social'); return; }
+    if (!document.getElementById('cad-cnpj')?.value.trim())  { toast('Informe o CNPJ'); return; }
+  }
+  if (cadStep === 2) {
+    if (!document.getElementById('cad-email')?.value.trim()) { toast('Informe o e-mail comercial'); return; }
+    if (!document.getElementById('cad-cel')?.value.trim())   { toast('Informe o celular/WhatsApp'); return; }
+  }
+  if (cadStep === 5) { submitCadastro(); return; }
+  cadStep++;
+  updateCadSteps();
+}
+function cadStepPrev() { if (cadStep > 1) { cadStep--; updateCadSteps(); } }
+function updateCadSteps() {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('cad-step-'+i).classList.toggle('active', i===cadStep);
+    const lbl = document.getElementById('cad-step-lbl-'+i);
+    lbl.classList.toggle('active', i===cadStep);
+    lbl.classList.toggle('done', i<cadStep);
+  }
+  document.getElementById('cad-btn-back').style.display = cadStep > 1 ? '' : 'none';
+  document.getElementById('cad-btn-next').textContent   = cadStep === 5 ? 'Finalizar Cadastro' : 'Próximo →';
+  // Auto-fill login email
+  const emailCom = document.getElementById('cad-email')?.value;
+  const loginEl  = document.getElementById('cad-loginEmail');
+  if (loginEl && emailCom) loginEl.value = emailCom;
+}
+function submitCadastro() {
+  const senha     = document.getElementById('cad-senha')?.value;
+  const senhaConf = document.getElementById('cad-senhaConf')?.value;
+  if (!senha || senha.length < 8) { toast('Senha deve ter mínimo 8 caracteres'); return; }
+  if (senha !== senhaConf) { toast('As senhas não conferem'); return; }
+  // Em produção: POST para backend BidFlow -> criarFornecedorDatasul()
+  document.getElementById('screen-cadastro').innerHTML = `
+    <div class="pf-login"><div class="login-card" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Cadastro enviado!</h2>
+      <p style="color:var(--text-3);font-size:14px;line-height:1.6">Seus dados foram recebidos e serão analisados pelo time de compras da Razzo.<br><br>
+      Você receberá um e-mail de confirmação em até <strong>2 dias úteis</strong>.<br><br>
+      Após a aprovação, suas credenciais de acesso ao portal serão enviadas por e-mail.</p>
+      <a href="portal-fornecedor.html" style="display:inline-block;margin-top:20px;color:var(--navy);font-size:13px">← Voltar para o login</a>
+    </div></div>`;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────
+function maskCNPJ(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,14);
+  v = v.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2')
+        .replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d)/,'$1-$2');
+  el.value = v;
+}
+function buscaCEP(el) {
+  const cep = el.value.replace(/\D/g,'');
+  if (cep.length === 8) toast('CEP ' + cep + ' encontrado (mock)');
+}
+function docUploaded(input, spanId) {
+  const f = input.files[0]; if (!f) return;
+  document.getElementById(spanId).textContent = '✓ ' + f.name;
+  document.getElementById(spanId).style.color = 'var(--green)';
+}
+function solicitarCadastro() {
+  toast('Solicite ao comprador da Razzo o link de cadastro.');
+}
+
+// ─── Init ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
