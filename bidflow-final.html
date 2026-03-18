@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BidFlow — Portal de Procurement</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f2f5;
+  --bg-2: #ffffff;
+  --bg-3: #f4f6f9;
+  --bg-4: #e8ecf2;
+  --border: #dde2ea;
+  --border-light: #c8d0dc;
+  --text: #1a2133;
+  --text-2: #4a5572;
+  --text-3: #8892a8;
+  --navy: #1e3a5f;
+  --navy-2: #163050;
+  --navy-3: #0d2040;
+  --navy-light: #e8eef7;
+  --navy-mid: #2563a8;
+  --green: #16a34a;
+  --green-light: #dcfce7;
+  --amber: #d97706;
+  --amber-light: #fef3c7;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --sidebar-w: 240px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 2px 16px rgba(30,58,95,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--navy-3);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.logo-mark{width:34px;height:34px;background:var(--navy-mid);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;flex-shrink:0}
+.logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff}
+.logo-accent{color:#60a5fa}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:18px}
+.nav-section{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,0.55);text-decoration:none;font-size:13.5px;transition:all .15s;cursor:pointer}
+.nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+.nav-item.active{background:rgba(96,165,250,0.18);color:#60a5fa;font-weight:500}
+.badge{margin-left:auto;background:rgba(96,165,250,0.2);color:#60a5fa;font-size:11px;font-weight:600;padding:1px 7px;border-radius:20px}
+.badge-warn{background:rgba(251,191,36,0.2);color:#fbbf24}
+.badge-danger{background:rgba(248,113,113,0.2);color:#f87171}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:14px;border-top:1px solid rgba(255,255,255,0.08);cursor:pointer}
+.user-avatar{width:32px;height:32px;background:var(--navy-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;display:block;color:#fff}
+.user-role{font-size:11px;color:rgba(255,255,255,0.4);display:block}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{height:60px;background:var(--bg-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.sidebar-toggle{background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;color:var(--text-2);display:none}
+.sidebar-toggle svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.breadcrumb{font-family:'Syne',sans-serif;font-weight:600;font-size:15px;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;width:280px}
+.search-bar svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13px;flex:1}
+.search-bar input::placeholder{color:var(--text-3)}
+.search-bar kbd{background:var(--bg-4);border:1px solid var(--border-light);border-radius:4px;font-size:10px;padding:1px 5px;color:var(--text-3)}
+.topbar-btn{width:36px;height:36px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);position:relative}
+.topbar-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg-2)}
+
+/* PAGES */
+.page-content{flex:1;padding:28px 28px 48px}
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;gap:16px}
+.page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--text)}
+.page-subtitle{color:var(--text-3);font-size:13.5px;margin-top:3px}
+.page-actions{display:flex;gap:10px;flex-shrink:0}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy-2)}
+.btn-secondary{background:var(--bg-3);color:var(--text);border:1px solid var(--border-light)}
+.btn-secondary:hover{background:var(--bg-4)}
+.btn-sm{padding:5px 12px;font-size:12.5px}
+.btn-ghost{background:none;border:none;color:var(--text-2);font-size:13px;cursor:pointer;padding:6px 10px;border-radius:6px;display:flex;align-items:center;gap:6px;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-ghost:hover,.btn-ghost.active{background:var(--bg-3);color:var(--text)}
+.btn-ghost.active{color:var(--navy)}
+.icon-btn{width:30px;height:30px;background:var(--bg-3);border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
+.icon-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+.icon-btn:hover{border-color:var(--navy);color:var(--navy)}
+
+/* CARDS */
+.card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-title{font-family:'Syne',sans-serif;font-size:14.5px;font-weight:600;color:var(--text)}
+.card-link{color:var(--navy-mid);font-size:13px;text-decoration:none}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;display:flex;gap:14px;align-items:center;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform .2s}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-blue::before{background:var(--navy-mid)}
+.kpi-amber::before{background:var(--amber)}
+.kpi-green::before{background:var(--green)}
+.kpi-purple::before{background:var(--purple)}
+.kpi-card:hover{transform:translateY(-1px)}
+.kpi-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-blue .kpi-icon{background:var(--navy-light);color:var(--navy)}
+.kpi-amber .kpi-icon{background:var(--amber-light);color:var(--amber)}
+.kpi-green .kpi-icon{background:var(--green-light);color:var(--green)}
+.kpi-purple .kpi-icon{background:var(--purple-light);color:var(--purple)}
+.kpi-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.kpi-content{display:flex;flex-direction:column;gap:2px}
+.kpi-label{font-size:12px;color:var(--text-3)}
+.kpi-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;line-height:1.2;color:var(--text)}
+.kpi-change{font-size:11.5px}
+.kpi-change.up{color:var(--green)}
+.kpi-change.warn{color:var(--amber)}
+
+/* DASHBOARD GRID */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.chart-card{grid-column:span 2}
+.chart-container{height:200px}
+
+/* ALERTS */
+.alert-list{display:flex;flex-direction:column;gap:10px}
+.alert-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;border:1px solid}
+.alert-red{background:rgba(220,38,38,0.05);border-color:rgba(220,38,38,0.2)}
+.alert-amber{background:rgba(217,119,6,0.05);border-color:rgba(217,119,6,0.2)}
+.alert-blue{background:var(--navy-light);border-color:rgba(30,58,95,0.2)}
+.alert-icon{font-size:16px}
+.alert-content{flex:1}
+.alert-title{font-size:13px;font-weight:500;display:block}
+.alert-sub{font-size:11.5px;color:var(--text-3)}
+
+/* SUPPLIER RANK */
+.supplier-rank{display:flex;flex-direction:column;gap:14px}
+.rank-item{display:flex;align-items:center;gap:10px}
+.rank-pos{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--bg-4);color:var(--text-3);flex-shrink:0}
+.rank-pos.gold{background:#78350f;color:#fbbf24}
+.rank-pos.silver{background:#374151;color:#9ca3af}
+.rank-pos.bronze{background:#431407;color:#fb923c}
+.rank-avatar{width:30px;height:30px;background:var(--navy-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);flex-shrink:0}
+.rank-info{flex:1}
+.rank-name{font-size:12.5px;font-weight:500;display:block;margin-bottom:4px}
+.rank-bar-wrap{background:var(--bg-4);border-radius:3px;height:4px}
+.rank-bar{height:4px;background:var(--navy-mid);border-radius:3px}
+.rank-value{font-size:12.5px;font-weight:600;white-space:nowrap}
+
+/* ACTIVITY */
+.activity-feed{display:flex;flex-direction:column}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.activity-dot.green{background:var(--green)}
+.activity-dot.blue{background:var(--navy-mid)}
+.activity-dot.amber{background:var(--amber)}
+.activity-dot.red{background:var(--red)}
+.activity-content{flex:1}
+.activity-text{font-size:13px;color:var(--text-2);display:block}
+.activity-time{font-size:11px;color:var(--text-3)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.filter-search{display:flex;align-items:center;gap:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;flex:1;min-width:200px}
+.filter-search svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2}
+.filter-search input{background:none;border:none;outline:none;color:var(--text);font-size:13px;flex:1}
+.filter-select{background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text-2);font-size:13px;cursor:pointer;outline:none;font-family:'DM Sans',sans-serif}
+
+/* TABLE */
+.table-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{background:var(--bg-3);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-2)}
+.data-table tbody tr:hover{background:var(--bg-3)}
+.data-table tbody tr:last-child td{border-bottom:none}
+.text-mono{font-family:monospace;font-size:12px}
+.table-entity{display:flex;align-items:center;gap:10px}
+.entity-avatar{width:34px;height:34px;background:var(--navy-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0}
+.entity-avatar.amber{background:var(--amber-light);color:var(--amber)}
+.entity-avatar.green{background:var(--green-light);color:var(--green)}
+.entity-name{font-size:13.5px;font-weight:500;color:var(--text);display:block}
+.entity-sub{font-size:11.5px;color:var(--text-3)}
+.score-wrap{display:flex;align-items:center;gap:8px}
+.score-bar{flex:1;height:5px;background:var(--bg-4);border-radius:3px}
+.score-fill{height:5px;background:var(--green);border-radius:3px}
+.score-num{font-size:12px;font-weight:600;width:24px}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border)}
+.table-info{font-size:12.5px;color:var(--text-3)}
+.pagination{display:flex;gap:4px;align-items:center;font-size:12px;color:var(--text-3)}
+.page-btn{width:28px;height:28px;background:var(--bg-3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-2);font-size:12px}
+.page-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.page-btn:disabled{opacity:.4;cursor:default}
+
+/* CHIPS & BADGES */
+.chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:500}
+.chip-blue{background:var(--navy-light);color:var(--navy)}
+.chip-amber{background:var(--amber-light);color:var(--amber)}
+.chip-green{background:var(--green-light);color:var(--green)}
+.chip-red{background:var(--red-light);color:var(--red)}
+.chip-purple{background:var(--purple-light);color:var(--purple)}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
+.status-green{background:var(--green-light);color:var(--green)}
+.status-amber{background:var(--amber-light);color:var(--amber)}
+.status-blue{background:var(--navy-light);color:var(--navy)}
+.status-gray{background:var(--bg-4);color:var(--text-3)}
+.status-red{background:var(--red-light);color:var(--red)}
+.action-btns{display:flex;gap:6px}
+
+/* RFQ */
+.rfq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rfq-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow)}
+.rfq-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rfq-id{font-family:monospace;font-size:11.5px;color:var(--text-3)}
+.rfq-title{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.rfq-meta{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--text-3);margin-bottom:12px}
+.rfq-progress{height:4px;background:var(--bg-4);border-radius:3px;margin-bottom:14px}
+.rfq-progress-bar{height:4px;background:var(--navy-mid);border-radius:3px;transition:width .5s}
+.rfq-actions{display:flex;gap:8px}
+
+/* COMPARE TABLE */
+.compare-table-wrap{overflow-x:auto}
+.compare-table{width:100%;border-collapse:collapse}
+.compare-table th,.compare-table td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--border);font-size:13.5px}
+.compare-table th:first-child,.compare-table td:first-child{text-align:left}
+.compare-table th{font-size:12px;color:var(--text-3);font-weight:600;background:var(--bg-3)}
+.supplier-col.best{color:var(--green);background:rgba(22,163,74,0.05)}
+.best-val{color:var(--green);font-weight:600}
+.total-row{background:var(--bg-3)}
+
+/* KANBAN */
+.kanban-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.kanban-col{min-width:210px;flex:1}
+.kanban-col-header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-bottom:8px}
+.kanban-col-title{font-size:12.5px;font-weight:600;color:var(--text-2)}
+.kanban-count{background:var(--bg-4);color:var(--text-3);font-size:11px;padding:1px 7px;border-radius:20px}
+.kanban-count-amber{background:var(--amber-light);color:var(--amber)}
+.kanban-count-blue{background:var(--navy-light);color:var(--navy)}
+.kanban-count-purple{background:var(--purple-light);color:var(--purple)}
+.kanban-count-green{background:var(--green-light);color:var(--green)}
+.kanban-card{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;box-shadow:var(--shadow)}
+.kanban-card:hover{border-color:var(--navy-mid)}
+.kanban-card.kanban-urgent{border-color:rgba(220,38,38,0.4);border-left:3px solid var(--red)}
+.kanban-card.kanban-done{opacity:.7}
+.kanban-badge{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.08em;margin-bottom:6px}
+.kanban-id{font-family:monospace;font-size:11px;color:var(--text-3);margin-bottom:4px}
+.kanban-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px}
+.kanban-meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3)}
+.kanban-approvers{display:flex;gap:6px;margin-top:8px}
+.approver-chip{font-size:10.5px;padding:2px 8px;border-radius:20px}
+.approver-chip.approved{background:var(--green-light);color:var(--green)}
+.approver-chip.pending{background:var(--amber-light);color:var(--amber)}
+.tracking-bar{display:flex;margin-top:10px}
+.tracking-step{flex:1;text-align:center;font-size:9px;padding:3px 2px;border-bottom:2px solid var(--bg-4);color:var(--text-3)}
+.tracking-step.done{border-color:var(--green);color:var(--green)}
+.tracking-step.active{border-color:var(--navy-mid);color:var(--navy-mid);font-weight:600}
+
+/* APPROVALS */
+.approval-list{display:flex;flex-direction:column;gap:12px}
+.approval-item{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.approval-item.urgent{border-left:3px solid var(--red)}
+.approval-info{flex:1}
+.approval-title{font-size:13.5px;font-weight:500;color:var(--text)}
+.approval-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+.approval-valor{font-size:14px;font-weight:600;color:var(--navy);white-space:nowrap}
+.approval-prazo{font-size:11px;color:var(--text-3);text-align:right;margin-top:2px}
+.approval-btns{display:flex;gap:8px}
+.btn-approve{background:var(--green-light);color:var(--green);border:1px solid rgba(22,163,74,0.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;font-family:'DM Sans',sans-serif}
+.btn-reject{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,0.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;font-family:'DM Sans',sans-serif}
+
+/* NF */
+.nf-table .match-ok{color:var(--green);font-weight:600}
+.nf-table .match-pend{color:var(--amber)}
+
+/* INTEGRATIONS */
+.integrations-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.int-category-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text-2)}
+.int-cards{display:flex;flex-direction:column;gap:8px}
+.int-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;transition:border-color .15s;box-shadow:var(--shadow)}
+.int-card.connected{border-color:rgba(22,163,74,0.3);background:rgba(22,163,74,0.02)}
+.int-card.pending-api{border-color:rgba(30,58,95,0.2);border-style:dashed;background:rgba(30,58,95,0.02)}
+.int-logo{width:38px;height:38px;border-radius:8px;background:var(--bg-4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text-2);flex-shrink:0}
+.int-logo.sap{background:#e8eef7;color:var(--navy)}
+.int-logo.ai{background:var(--purple-light);color:var(--purple)}
+.int-logo.nfe{background:var(--green-light);color:var(--green);font-size:9px}
+.int-info{flex:1}
+.int-name{font-size:13px;font-weight:500;display:block;color:var(--text)}
+.int-desc{font-size:11.5px;color:var(--text-3)}
+.int-status-ok{color:var(--green);font-size:12px;font-weight:500;white-space:nowrap}
+.int-status-pend{color:var(--amber);font-size:11px;white-space:nowrap}
+.int-tag-mock{background:var(--amber-light);color:var(--amber);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.analytics-title{font-size:11px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.analytics-big{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.analytics-sub{font-size:12px;color:var(--green);margin-bottom:14px}
+
+/* CONTRACTS */
+.contract-list{display:flex;flex-direction:column;gap:10px}
+.contract-item{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.contract-item.vencendo{border-left:3px solid var(--amber)}
+.contract-info{flex:1}
+.contract-id{font-family:monospace;font-size:11px;color:var(--text-3);margin-bottom:3px}
+.contract-obj{font-size:13.5px;font-weight:500;color:var(--text)}
+.contract-meta{font-size:12px;color:var(--text-3);margin-top:2px}
+.contract-valor{font-size:14px;font-weight:600;color:var(--navy);text-align:right}
+.contract-periodo{font-size:11px;color:var(--text-3);text-align:right;margin-top:2px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg-2);border:1px solid var(--border-light);border-radius:var(--radius-lg);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{transform:translateY(16px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border)}
+.modal-header h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text-3);font-size:18px;cursor:pointer;padding:0 4px}
+.modal-body{padding:20px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid var(--border)}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-group label{font-size:12.5px;font-weight:500;color:var(--text-2)}
+.form-input{background:var(--bg-3);border:1px solid var(--border-light);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13.5px;outline:none;width:100%;font-family:'DM Sans',sans-serif}
+.form-input:focus{border-color:var(--navy)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.multi-select{display:flex;align-items:center;flex-wrap:wrap;gap:6px;background:var(--bg-3);border:1px solid var(--border-light);border-radius:8px;padding:6px 10px;min-height:38px}
+.multi-tag{background:var(--navy-light);color:var(--navy);padding:2px 8px;border-radius:20px;font-size:12px;display:flex;align-items:center;gap:4px}
+.multi-tag button{background:none;border:none;color:var(--navy);cursor:pointer;font-size:12px}
+.multi-select input{background:none;border:none;outline:none;color:var(--text);font-size:13px;min-width:80px}
+.upload-zone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;border:2px dashed var(--border-light);border-radius:10px;cursor:pointer;color:var(--text-3);transition:border-color .15s}
+.upload-zone:hover{border-color:var(--navy)}
+.upload-zone svg{width:28px;height:28px;stroke:var(--text-3);fill:none;stroke-width:1.5}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy-3);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:toastIn .3s ease;display:none}
+.toast.show{display:block}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* RESPONSIVE */
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.analytics-grid{grid-template-columns:repeat(2,1fr)}.rfq-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.sidebar-toggle{display:flex}.dashboard-grid{grid-template-columns:1fr}.chart-card{grid-column:span 1}.integrations-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.search-bar{display:none}.kpi-grid{grid-template-columns:1fr}.rfq-grid{grid-template-columns:1fr}.analytics-grid{grid-template-columns:1fr 1fr}.page-content{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">B</div>
+    <span class="logo-text">Bid<span class="logo-accent">Flow</span></span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-label">Principal</span>
+      <a class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </a>
+      <a class="nav-item" data-page="requisitions">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Requisições
+        <span class="badge">5</span>
+      </a>
+      <a class="nav-item" data-page="rfq">
+        <svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>RFQ / Cotações
+        <span class="badge badge-warn">4</span>
+      </a>
+      <a class="nav-item" data-page="orders">
+        <svg viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>Pedidos de Compra
+      </a>
+      <a class="nav-item" data-page="approvals">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Aprovações
+        <span class="badge badge-warn">5</span>
+      </a>
+      <a class="nav-item" data-page="contracts">
+        <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Contratos
+      </a>
+      <a class="nav-item" data-page="invoices">
+        <svg viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>Notas Fiscais
+        <span class="badge badge-danger">2</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Gestão</span>
+      <a class="nav-item" data-page="suppliers">
+        <svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Fornecedores
+      </a>
+      <a class="nav-item" data-page="analytics">
+        <svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Analytics
+      </a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Sistema</span>
+      <a class="nav-item" data-page="integrations">
+        <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>Integrações
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">MR</div>
+    <div class="user-info">
+      <span class="user-name">Maria Ribeiro</span>
+      <span class="user-role">Gerente de Compras</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar pedidos, fornecedores...">
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="topbar-btn"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+    </div>
+  </header>
+
+  <div class="page-content" id="pageContent">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" id="dash-greeting">Bom dia, Maria 👋</h1>
+          <p class="page-subtitle" id="dash-date">Aqui está o resumo de procurement de hoje</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="showPage('requisitions')">Nova Requisição</button>
+          <button class="btn btn-primary" onclick="showPage('rfq')">Iniciar Cotação</button>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="dashboard-grid">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">Spend por Categoria</h3>
+            <div class="card-actions" style="display:flex;gap:4px">
+              <button class="btn-ghost active">Mês</button>
+              <button class="btn-ghost">Trimestre</button>
+              <button class="btn-ghost">Ano</button>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="spendChart"></canvas></div>
+        </div>
+        <div class="card" id="alerts-card">
+          <div class="card-header"><h3 class="card-title">Pendências Críticas</h3><a class="card-link" onclick="showPage('approvals')">Ver todas</a></div>
+          <div class="alert-list" id="alert-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Top Fornecedores do Mês</h3></div>
+          <div class="supplier-rank" id="supplier-rank"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Últimas Atividades</h3></div>
+          <div class="activity-feed" id="activity-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUISIÇÕES -->
+    <div class="page" id="page-requisitions">
+      <div class="page-header">
+        <div><h1 class="page-title">Requisições</h1><p class="page-subtitle">Solicitações internas de compra</p></div>
+        <div class="page-actions"><button class="btn btn-primary" onclick="openModal('reqModal')">+ Nova Requisição</button></div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" placeholder="Buscar requisições..."></div>
+        <select class="filter-select"><option>Todos os status</option><option>Em análise</option><option>Aprovada</option><option>Concluída</option></select>
+      </div>
+      <div class="table-card">
+        <table class="data-table">
+          <thead><tr><th><input type="checkbox"></th><th>ID</th><th>Descrição</th><th>Solicitante</th><th>Valor Est.</th><th>Prioridade</th><th>Status</th><th></th></tr></thead>
+          <tbody id="req-tbody"></tbody>
+        </table>
+        <div class="table-footer"><span class="table-info" id="req-info"></span></div>
+      </div>
+    </div>
+
+    <!-- RFQ -->
+    <div class="page" id="page-rfq">
+      <div class="page-header">
+        <div><h1 class="page-title">Cotações (RFQ)</h1><p class="page-subtitle">Solicite, compare e selecione propostas</p></div>
+        <div class="page-actions"><button class="btn btn-primary" onclick="openModal('rfqModal')">+ Nova Cotação</button></div>
+      </div>
+      <div class="rfq-grid" id="rfq-grid"></div>
+      <div class="card" style="margin-top:2rem">
+        <div class="card-header"><h3 class="card-title">Comparativo de Propostas — RFQ-2024-0891</h3><button class="btn btn-secondary btn-sm" onclick="toast('Excel gerado!')">Exportar Excel</button></div>
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead><tr><th>Item</th><th>Qtd.</th><th class="supplier-col best">TechSupply ⭐</th><th class="supplier-col">DataMax</th><th class="supplier-col">InfoCorp</th></tr></thead>
+            <tbody id="rfq-compare-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="page" id="page-orders">
+      <div class="page-header">
+        <div><h1 class="page-title">Pedidos de Compra</h1><p class="page-subtitle">Acompanhamento por status</p></div>
+        <div class="page-actions"><button class="btn btn-primary">+ Novo Pedido</button></div>
+      </div>
+      <div class="kanban-board" id="kanban-board"></div>
+    </div>
+
+    <!-- APROVAÇÕES -->
+    <div class="page" id="page-approvals">
+      <div class="page-header">
+        <div><h1 class="page-title">Aprovações</h1><p class="page-subtitle">Documentos aguardando sua ação</p></div>
+        <div class="page-actions"><button class="btn btn-secondary">Delegar</button></div>
+      </div>
+      <div class="approval-list" id="approval-list"></div>
+    </div>
+
+    <!-- CONTRATOS -->
+    <div class="page" id="page-contracts">
+      <div class="page-header">
+        <div><h1 class="page-title">Contratos</h1><p class="page-subtitle">Gestão e vencimentos</p></div>
+        <div class="page-actions"><button class="btn btn-primary">+ Novo Contrato</button></div>
+      </div>
+      <div class="contract-list" id="contract-list"></div>
+    </div>
+
+    <!-- NFS -->
+    <div class="page" id="page-invoices">
+      <div class="page-header">
+        <div><h1 class="page-title">Notas Fiscais</h1><p class="page-subtitle">Recebimento, validação e 3-way matching</p></div>
+      </div>
+      <div class="table-card">
+        <table class="data-table nf-table">
+          <thead><tr><th>Número</th><th>Fornecedor</th><th>Pedido</th><th>Valor</th><th>Emissão</th><th>Status</th><th>3-Way Match</th><th></th></tr></thead>
+          <tbody id="nf-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FORNECEDORES -->
+    <div class="page" id="page-suppliers">
+      <div class="page-header">
+        <div><h1 class="page-title">Fornecedores</h1><p class="page-subtitle" id="supplier-subtitle"></p></div>
+        <div class="page-actions"><button class="btn btn-secondary">Importar CSV</button><button class="btn btn-primary" onclick="openModal('supplierModal')">+ Novo Fornecedor</button></div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" placeholder="Buscar por nome, CNPJ..."></div>
+        <select class="filter-select"><option>Todos os status</option><option>Aprovado</option><option>Homologando</option></select>
+      </div>
+      <div class="table-card">
+        <table class="data-table">
+          <thead><tr><th><input type="checkbox"></th><th>Fornecedor</th><th>CNPJ</th><th>Categoria</th><th>Score</th><th>Status</th><th>Contratos</th><th>Último Pedido</th><th></th></tr></thead>
+          <tbody id="supplier-tbody"></tbody>
+        </table>
+        <div class="table-footer"><span class="table-info" id="supplier-info"></span></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="page-header">
+        <div><h1 class="page-title">Analytics</h1><p class="page-subtitle">Visibilidade do ciclo de compras</p></div>
+        <div class="page-actions"><button class="btn btn-primary" onclick="toast('Relatório exportado!')">Exportar PDF</button></div>
+      </div>
+      <div class="analytics-grid">
+        <div class="card"><div class="analytics-title">Savings Realizados</div><div class="analytics-big">R$ 213K</div><div class="analytics-sub">↑ 18% vs anterior</div><canvas id="savingsChart" height="80"></canvas></div>
+        <div class="card"><div class="analytics-title">Lead Time Médio</div><div class="analytics-big">8,2 dias</div><div class="analytics-sub">↓ 1,4 dias vs anterior</div><canvas id="leadChart" height="80"></canvas></div>
+        <div class="card"><div class="analytics-title">Compliance</div><div class="analytics-big">94,3%</div><div class="analytics-sub">↑ 1,3pp vs anterior</div><canvas id="complianceChart" height="80"></canvas></div>
+        <div class="card"><div class="analytics-title">SRM Score</div><div class="analytics-big">8,1/10</div><div class="analytics-sub">↑ 0,3 vs anterior</div><canvas id="srmChart" height="80"></canvas></div>
+      </div>
+    </div>
+
+    <!-- INTEGRAÇÕES -->
+    <div class="page" id="page-integrations">
+      <div class="page-header">
+        <div><h1 class="page-title">Integrações</h1><p class="page-subtitle">Conecte o BidFlow ao Datasul e sistemas externos</p></div>
+      </div>
+      <div style="background:var(--amber-light);border:1px solid rgba(217,119,6,0.3);border-radius:10px;padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--amber);display:flex;gap:10px;align-items:center">
+        <span style="font-size:16px">⚡</span>
+        <span><strong>Modo demonstração ativo.</strong> Todas as integrações abaixo estão com dados simulados. Para ativar, configure as credenciais do Datasul e habilite a API REST no servidor da Razzo.</span>
+      </div>
+      <div class="integrations-grid" id="int-grid"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="rfqModal" onclick="closeModal('rfqModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h2>Nova Cotação (RFQ)</h2><button class="modal-close" onclick="closeModal('rfqModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Título da Cotação</label><input type="text" class="form-input" placeholder="Ex: Notebooks para TI — Q2 2026"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Prazo de Resposta</label><input type="datetime-local" class="form-input"></div>
+        <div class="form-group"><label>Moeda</label><select class="form-input"><option>BRL — Real</option><option>USD — Dólar</option></select></div>
+      </div>
+      <div class="form-group"><label>Fornecedores Convidados</label>
+        <div class="multi-select"><span class="multi-tag">TechSupply <button>×</button></span><span class="multi-tag">DataMax <button>×</button></span><input type="text" placeholder="Adicionar..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('rfqModal')">Cancelar</button>
+      <button class="btn btn-secondary">Salvar Rascunho</button>
+      <button class="btn btn-primary" onclick="closeModal('rfqModal');toast('RFQ enviado para fornecedores!')">Enviar RFQ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="supplierModal" onclick="closeModal('supplierModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h2>Cadastrar Fornecedor</h2><button class="modal-close" onclick="closeModal('supplierModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Razão Social</label><input type="text" class="form-input" placeholder="Nome da empresa"></div>
+        <div class="form-group"><label>CNPJ</label><input type="text" class="form-input" placeholder="00.000.000/0000-00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Categoria</label><select class="form-input"><option>TI & Tecnologia</option><option>MRO</option><option>Serviços</option><option>Logística</option></select></div>
+        <div class="form-group"><label>E-mail Comercial</label><input type="email" class="form-input" placeholder="contato@fornecedor.com"></div>
+      </div>
+      <div class="form-group"><label>Documentos</label>
+        <div class="upload-zone"><svg viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg><span>Arraste ou clique para enviar</span><span style="font-size:11px;color:var(--text-3)">Contrato social, certidões · PDF</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('supplierModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('supplierModal');toast('Fornecedor enviado para homologação!')">Iniciar Homologação</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reqModal" onclick="closeModal('reqModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h2>Nova Requisição de Compra</h2><button class="modal-close" onclick="closeModal('reqModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Descrição do Item / Serviço</label><input type="text" class="form-input" placeholder="Descreva o que precisa ser comprado"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Valor Estimado (R$)</label><input type="number" class="form-input" placeholder="0,00"></div>
+        <div class="form-group"><label>Prioridade</label><select class="form-input"><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Centro de Custo</label><input type="text" class="form-input" placeholder="Ex: TI, ADM, Produção"></div>
+        <div class="form-group"><label>Data Necessária</label><input type="date" class="form-input"></div>
+      </div>
+      <div class="form-group"><label>Justificativa</label><textarea class="form-input" rows="3" placeholder="Motivo da compra..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('reqModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('reqModal');toast('Requisição criada com sucesso!')">Criar Requisição</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// MOCK DATA — substituir por fetch() ao integrar com Datasul
+// ============================================================
+const MOCK = {
+  kpis: { pedidosAbertos:38, aguardandoAprovacao:7, economizadoMes:48400, fornecedoresAtivos:142 },
+  spendMensal: {
+    labels:['Out','Nov','Dez','Jan','Fev','Mar'],
+    ti:[142,160,120,185,145,168], mro:[65,70,58,82,75,90],
+    servicos:[88,92,85,100,95,112], logistica:[40,35,42,50,38,47]
+  },
+  alertas:[
+    {tipo:'red',  icone:'⚠',titulo:'NF 4521 vencida há 3 dias',    sub:'Fornecedor: TechSupply LTDA',  acao:'Resolver'},
+    {tipo:'amber',icone:'🕐',titulo:'Cotação expira em 2h',         sub:'RFQ-2024-0891 · 3 fornecedores',acao:'Ver'},
+    {tipo:'amber',icone:'📋',titulo:'Aprovação pendente — Diretoria',sub:'PC-2024-1102 · R$ 87.400',     acao:'Aprovar'},
+    {tipo:'blue', icone:'🚚',titulo:'Entrega atrasada 1 dia',        sub:'PO-2024-0774 · Logística',     acao:'Rastrear'}
+  ],
+  topFornecedores:[
+    {sigla:'TS',nome:'TechSupply LTDA',   valor:142000,pct:90,pos:'gold'},
+    {sigla:'OP',nome:'OfficePro Express', valor:98000, pct:65,pos:'silver'},
+    {sigla:'LG',nome:'LogiMaster',        valor:67000, pct:45,pos:'bronze'},
+    {sigla:'SE',nome:'Segurity Engenharia',valor:43000,pct:30,pos:''}
+  ],
+  atividades:[
+    {cor:'green',texto:'<strong>PC-1104</strong> aprovado por <strong>Carlos Mendes</strong>',tempo:'há 12 min'},
+    {cor:'blue', texto:'Nova cotação recebida de <strong>TechSupply</strong> — RFQ-891',      tempo:'há 43 min'},
+    {cor:'amber',texto:'<strong>REQ-2204</strong> criada por <strong>Ana Ferreira</strong>',  tempo:'há 1h'},
+    {cor:'red',  texto:'Contrato <strong>CNT-0045</strong> vence em 15 dias',                 tempo:'há 2h'},
+    {cor:'green',texto:'NF <strong>4520</strong> conciliada automaticamente',                  tempo:'há 3h'}
+  ],
+  requisicoes:[
+    {id:'REQ-2204',descricao:'10 Notebooks Dell i7 16GB',       solicitante:'Ana Ferreira · TI',   valor:72000, prioridade:'Alta', status:'Em análise'},
+    {id:'REQ-2203',descricao:'Mobiliário Sala de Reuniões',      solicitante:'Carlos Mendes · ADM', valor:18500, prioridade:'Média',status:'Aprovada'},
+    {id:'REQ-2202',descricao:'Licenças Antivírus (50 users)',    solicitante:'João Souza · TI',     valor:4200,  prioridade:'Baixa',status:'Concluída'},
+    {id:'REQ-2201',descricao:'Materiais de Higiene Industrial',  solicitante:'Paula Lima · Prod',   valor:9800,  prioridade:'Média',status:'Em análise'},
+    {id:'REQ-2200',descricao:'Impressoras HP LaserJet',          solicitante:'Marcos Silva · ADM',  valor:7400,  prioridade:'Baixa',status:'Aprovada'}
+  ],
+  rfqs:[
+    {id:'RFQ-2024-0891',titulo:'Notebooks e Periféricos',       status:'Em andamento',statusClass:'status-blue', vence:'17/03 18:00',respostas:3,total:5,valor:45000,pct:60,
+     propostas:[{item:'Notebook Dell i7 16GB',qtd:10,ts:7200,dm:7650,ic:7950},{item:'Mouse sem fio',qtd:20,ts:89,dm:89,ic:110},{item:'Monitor 27" 4K',qtd:5,ts:2100,dm:1980,ic:2250}]},
+    {id:'RFQ-2024-0890',titulo:'Serviços de Limpeza — Anual',   status:'Análise',     statusClass:'status-amber',vence:'15/03 Encerrado',respostas:4,total:4,valor:120000,pct:100,propostas:[]},
+    {id:'RFQ-2024-0892',titulo:'Material de Escritório Q2',     status:'Rascunho',    statusClass:'status-gray', vence:'Não enviado',respostas:0,total:0,valor:8000,pct:20,propostas:[]}
+  ],
+  pedidos:[
+    {id:'PC-2024-1108',titulo:'Equipamentos de Segurança',   fornecedor:'Segurity Eng.', valor:12400,status:'Rascunho', urgente:false},
+    {id:'PC-2024-1107',titulo:'Suprimentos TI',              fornecedor:'TechSupply',    valor:8900, status:'Rascunho', urgente:false},
+    {id:'PC-2024-1104',titulo:'Servidor Dell PowerEdge R740',fornecedor:'TechSupply',    valor:87400,status:'Aprovacao',urgente:true},
+    {id:'PC-2024-1103',titulo:'Material Elétrico',           fornecedor:'ElectroPro',    valor:4200, status:'Aprovacao',urgente:false},
+    {id:'PC-2024-1102',titulo:'Licenças Microsoft 365',      fornecedor:'TechSupply',    valor:24000,status:'Aprovado', urgente:false},
+    {id:'PC-2024-1101',titulo:'Mobiliário Escritório',       fornecedor:'FurniCorp',     valor:18700,status:'Aprovado', urgente:false},
+    {id:'PC-2024-1099',titulo:'Cabos e Conectores',          fornecedor:'CableWorld',    valor:3100, status:'Transito', urgente:false},
+    {id:'PC-2024-1095',titulo:'Impressoras HP A4',           fornecedor:'OfficePro',     valor:6800, status:'Recebido', urgente:false}
+  ],
+  aprovacoes:[
+    {id:'PC-2024-1104',tipo:'Pedido de Compra',valor:87400, solicitante:'Maria Ribeiro',fornecedor:'TechSupply', alca:'Diretoria',prazo:'Hoje 18h',urgente:true},
+    {id:'PC-2024-1103',tipo:'Pedido de Compra',valor:4200,  solicitante:'João Souza',   fornecedor:'ElectroPro', alca:'Gerência', prazo:'Amanhã',  urgente:false},
+    {id:'RFQ-0891',    tipo:'Cotação',         valor:45000, solicitante:'Ana Ferreira', fornecedor:'TechSupply', alca:'Gerência', prazo:'Hoje 18h',urgente:true},
+    {id:'CNT-0049',    tipo:'Contrato',        valor:96000, solicitante:'Carlos Mendes',fornecedor:'LogiMaster', alca:'Diretoria',prazo:'17/03',   urgente:false},
+    {id:'REQ-2204',    tipo:'Requisição',      valor:72000, solicitante:'Ana Ferreira', fornecedor:'—',          alca:'Gerência', prazo:'Sem prazo',urgente:false}
+  ],
+  contratos:[
+    {id:'CNT-0048',fornecedor:'TechSupply LTDA',   objeto:'Suporte TI mensal',     valor:8500,  inicio:'01/01/2026',fim:'31/12/2026',status:'Ativo'},
+    {id:'CNT-0047',fornecedor:'OfficePro Express', objeto:'Fornecimento MRO',      valor:45000, inicio:'01/02/2026',fim:'31/01/2027',status:'Ativo'},
+    {id:'CNT-0046',fornecedor:'LogiMaster',        objeto:'Transporte regional',   valor:72000, inicio:'01/03/2026',fim:'28/02/2027',status:'Ativo'},
+    {id:'CNT-0045',fornecedor:'Segurity Engenharia',objeto:'Segurança patrimonial',valor:120000,inicio:'01/04/2025',fim:'31/03/2026',status:'Vencendo'}
+  ],
+  notasFiscais:[
+    {num:'NF-4522',fornecedor:'TechSupply LTDA',  pedido:'PC-2024-1095',valor:6800, emissao:'10/03/2026',status:'Conciliada',matching:'OK'},
+    {num:'NF-4521',fornecedor:'OfficePro Express',pedido:'PC-2024-1088',valor:3200, emissao:'01/03/2026',status:'Vencida',   matching:'Pendente'},
+    {num:'NF-4520',fornecedor:'LogiMaster',       pedido:'PC-2024-1090',valor:9100, emissao:'08/03/2026',status:'Conciliada',matching:'OK'},
+    {num:'NF-4519',fornecedor:'FurniCorp',        pedido:'PC-2024-1101',valor:18700,emissao:'14/03/2026',status:'Aguardando',matching:'Pendente'}
+  ],
+  fornecedores:[
+    {sigla:'TS',nome:'TechSupply LTDA',        cnpj:'12.345.678/0001-90',categoria:'TI & Tecnologia',catClass:'chip-blue',  score:9.2,status:'Aprovado',   statusClass:'status-green',contratos:'3 ativos', ultimo:'12 Mar 2026',cor:''},
+    {sigla:'OP',nome:'OfficePro Express',       cnpj:'98.765.432/0001-11',categoria:'MRO',            catClass:'chip-amber', score:8.5,status:'Aprovado',   statusClass:'status-green',contratos:'1 ativo',  ultimo:'10 Mar 2026',cor:'amber'},
+    {sigla:'LM',nome:'LogiMaster',              cnpj:'55.111.222/0001-33',categoria:'Logística',      catClass:'chip-green', score:7.0,status:'Homologando',statusClass:'status-amber',contratos:'—',        ultimo:'08 Mar 2026',cor:'green'},
+    {sigla:'SE',nome:'Segurity Engenharia',     cnpj:'33.444.555/0001-77',categoria:'Serviços',       catClass:'chip-purple',score:8.1,status:'Aprovado',   statusClass:'status-green',contratos:'2 ativos', ultimo:'05 Mar 2026',cor:''},
+    {sigla:'EP',nome:'ElectroPro Materiais',    cnpj:'77.888.999/0001-22',categoria:'MRO',            catClass:'chip-amber', score:6.8,status:'Homologando',statusClass:'status-amber',contratos:'—',        ultimo:'01 Mar 2026',cor:'amber'},
+    {sigla:'FC',nome:'FurniCorp Design',        cnpj:'44.333.111/0001-55',categoria:'Serviços',       catClass:'chip-purple',score:7.9,status:'Aprovado',   statusClass:'status-green',contratos:'1 ativo',  ultimo:'28 Fev 2026',cor:'green'}
+  ],
+  integracoes:[
+    {cat:'ERP & Financeiro',itens:[
+      {logo:'SAP',logoClass:'sap',nome:'SAP S/4HANA',desc:'Pedidos, NFs, contabilidade',status:'mock'},
+      {logo:'DS', logoClass:'sap',nome:'TOTVS Datasul (MCC)',desc:'Compras — API REST pendente',status:'pending',tag:'Aguardando API'},
+      {logo:'TV', logoClass:'',  nome:'TOTVS Protheus',desc:'Compras e estoque',status:'idle'}
+    ]},
+    {cat:'Governo & Fiscal',itens:[
+      {logo:'NF-e',logoClass:'nfe',nome:'SEFAZ / NF-e',desc:'Validação automática de NFs',status:'mock'},
+      {logo:'RF', logoClass:'',   nome:'Receita Federal',desc:'Validação CNPJ automática',status:'mock'},
+      {logo:'SP', logoClass:'',   nome:'SERPRO / SICAF',desc:'Cadastros PJ',status:'idle'}
+    ]},
+    {cat:'Comunicação',itens:[
+      {logo:'📧',logoClass:'',nome:'E-mail / SMTP',      desc:'Notificações automáticas',status:'mock'},
+      {logo:'WA',logoClass:'',nome:'WhatsApp Business',  desc:'Alertas para fornecedores',status:'mock'},
+      {logo:'SL',logoClass:'',nome:'Slack / Teams',      desc:'Alertas em tempo real',status:'idle'}
+    ]},
+    {cat:'Pagamentos',itens:[
+      {logo:'PIX',logoClass:'',nome:'Pix Automático',    desc:'Pagamentos aprovados automáticos',status:'idle'},
+      {logo:'BB', logoClass:'',nome:'Banco do Brasil API',desc:'Conciliação bancária',status:'idle'}
+    ]}
+  ]
+};
+
+const brl = v => 'R$ ' + (v>=1000?(v/1000).toFixed(0)+'K':v.toLocaleString('pt-BR'));
+const brlFull = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+// ---- NAVIGATION ----
+const pageNames = {dashboard:'Dashboard',requisitions:'Requisições',rfq:'Cotações (RFQ)',orders:'Pedidos de Compra',approvals:'Aprovações',contracts:'Contratos',invoices:'Notas Fiscais',suppliers:'Fornecedores',analytics:'Analytics',integrations:'Integrações'};
+let chartsInitted = {};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page = document.getElementById('page-'+id);
+  if(page) page.classList.add('active');
+  const nav = document.querySelector(`[data-page="${id}"]`);
+  if(nav) nav.classList.add('active');
+  document.getElementById('breadcrumb').textContent = pageNames[id]||id;
+  if(window.innerWidth<=900) document.getElementById('sidebar').classList.remove('open');
+  if(!chartsInitted[id]) { renderCharts(id); chartsInitted[id]=true; }
+}
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',e=>{e.preventDefault();showPage(item.dataset.page);});
+});
+document.getElementById('sidebarToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+// ---- MODALS ----
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+window.openModal=openModal;window.closeModal=closeModal;
+
+// ---- TOAST ----
+function toast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+window.toast=toast;
+
+// ---- RENDER DASHBOARD ----
+function renderDashboard() {
+  const now = new Date();
+  const h = now.getHours();
+  const greet = h<12?'Bom dia':'h<18?Boa tarde':'Boa noite';
+  document.getElementById('dash-greeting').textContent = (h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', Maria 👋';
+  document.getElementById('dash-date').textContent = 'Aqui está o resumo de procurement de hoje — '+now.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+
+  // KPIs
+  const kpiDef=[
+    {key:'pedidosAbertos',   label:'Pedidos em Aberto',      cls:'kpi-blue',  change:'up',  changeText:'+5 esta semana',
+     icon:'<svg viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>'},
+    {key:'aguardandoAprovacao',label:'Aguardando Aprovação', cls:'kpi-amber', change:'warn',changeText:'3 urgentes',
+     icon:'<svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'},
+    {key:'economizadoMes',   label:'Economizado (Mar)',       cls:'kpi-green', change:'up',  changeText:'↑ 12% vs fev',
+     icon:'<svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'},
+    {key:'fornecedoresAtivos',label:'Fornecedores Ativos',   cls:'kpi-purple',change:'up',  changeText:'6 novos',
+     icon:'<svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>'}
+  ];
+  document.getElementById('kpi-grid').innerHTML = kpiDef.map(k=>`
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-content">
+        <span class="kpi-label">${k.label}</span>
+        <span class="kpi-value">${k.key==='economizadoMes'?brl(MOCK.kpis[k.key]):MOCK.kpis[k.key]}</span>
+        <span class="kpi-change ${k.change}">${k.changeText}</span>
+      </div>
+    </div>`).join('');
+
+  // Alerts
+  document.getElementById('alert-list').innerHTML = MOCK.alertas.map(a=>`
+    <div class="alert-item alert-${a.tipo}">
+      <div class="alert-icon">${a.icone}</div>
+      <div class="alert-content"><span class="alert-title">${a.titulo}</span><span class="alert-sub">${a.sub}</span></div>
+      <button class="btn btn-secondary btn-sm" onclick="toast('${a.acao} acionado!')">${a.acao}</button>
+    </div>`).join('');
+
+  // Top Suppliers
+  document.getElementById('supplier-rank').innerHTML = MOCK.topFornecedores.map((s,i)=>`
+    <div class="rank-item">
+      <span class="rank-pos ${s.pos}">${i+1}</span>
+      <div class="rank-avatar">${s.sigla}</div>
+      <div class="rank-info">
+        <span class="rank-name">${s.nome}</span>
+        <div class="rank-bar-wrap"><div class="rank-bar" style="width:${s.pct}%"></div></div>
+      </div>
+      <span class="rank-value">${brl(s.valor)}</span>
+    </div>`).join('');
+
+  // Activity
+  document.getElementById('activity-feed').innerHTML = MOCK.atividades.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot ${a.cor}"></div>
+      <div class="activity-content">
+        <span class="activity-text">${a.texto}</span>
+        <span class="activity-time">${a.tempo}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ---- RENDER REQUISITIONS ----
+function renderRequisitions() {
+  const prioMap={'Alta':'chip-red','Média':'chip-amber','Baixa':'chip-green'};
+  const stMap={'Em análise':'status-amber','Aprovada':'status-blue','Concluída':'status-green'};
+  document.getElementById('req-tbody').innerHTML = MOCK.requisicoes.map(r=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td class="text-mono">${r.id}</td>
+      <td><span style="font-weight:500;color:var(--text)">${r.descricao}</span></td>
+      <td>${r.solicitante}</td>
+      <td style="font-weight:600">${brl(r.valor)}</td>
+      <td><span class="chip ${prioMap[r.prioridade]}">${r.prioridade}</span></td>
+      <td><span class="status-badge ${stMap[r.status]}">${r.status}</span></td>
+      <td><div class="action-btns">
+        <button class="btn btn-primary btn-sm" onclick="toast('Convertendo ${r.id} em RFQ...');showPage('rfq')">→ RFQ</button>
+        <button class="btn btn-secondary btn-sm" onclick="toast('${r.id} visualizada')">Ver</button>
+      </div></td>
+    </tr>`).join('');
+  document.getElementById('req-info').textContent = `${MOCK.requisicoes.length} requisições encontradas`;
+}
+
+// ---- RENDER RFQ ----
+function renderRFQ() {
+  const stColors={'Em andamento':'#2563a8','Análise':'var(--amber)','Rascunho':'var(--text-3)'};
+  document.getElementById('rfq-grid').innerHTML = MOCK.rfqs.map(r=>`
+    <div class="rfq-card">
+      <div class="rfq-header"><span class="rfq-id">${r.id}</span><span class="status-badge ${r.statusClass}">${r.status}</span></div>
+      <h4 class="rfq-title">${r.titulo}</h4>
+      <div class="rfq-meta">
+        <span>📅 ${r.vence}</span>
+        <span>🏢 ${r.respostas}/${r.total} respostas</span>
+        <span>💰 ${brl(r.valor)}</span>
+      </div>
+      <div class="rfq-progress"><div class="rfq-progress-bar" style="width:${r.pct}%;background:${stColors[r.status]}"></div></div>
+      <div class="rfq-actions">
+        <button class="btn btn-secondary btn-sm" onclick="toast('Propostas de ${r.id}')">Ver Propostas</button>
+        ${r.status!=='Rascunho'?`<button class="btn btn-primary btn-sm" onclick="toast('Comparativo de ${r.id}')">Comparar</button>`:`<button class="btn btn-primary btn-sm" onclick="toast('${r.id} enviado!')">Enviar</button>`}
+      </div>
+    </div>`).join('');
+
+  // Compare table
+  const rfq = MOCK.rfqs[0];
+  let total = {ts:0,dm:0,ic:0};
+  let rows = rfq.propostas.map(p=>{
+    total.ts+=p.ts*p.qtd; total.dm+=p.dm*p.qtd; total.ic+=p.ic*p.qtd;
+    const minV = Math.min(p.ts,p.dm,p.ic);
+    const td = v=>`<td${v===minV?' class="best-val"':''}>R$ ${v.toLocaleString('pt-BR')}</td>`;
+    return `<tr><td>${p.item}</td><td>${p.qtd}</td>${td(p.ts)}${td(p.dm)}${td(p.ic)}</tr>`;
+  }).join('');
+  const minT = Math.min(total.ts,total.dm,total.ic);
+  const ttd = v=>`<td${v===minT?' class="best-val"':''}><strong>R$ ${v.toLocaleString('pt-BR')}</strong></td>`;
+  rows += `<tr class="total-row"><td colspan="2"><strong>Total</strong></td>${ttd(total.ts)}${ttd(total.dm)}${ttd(total.ic)}</tr>`;
+  document.getElementById('rfq-compare-tbody').innerHTML = rows;
+}
+
+// ---- RENDER KANBAN ----
+function renderKanban() {
+  const cols = [
+    {key:'Rascunho', label:'Rascunho',  countCls:'',               countQty:0},
+    {key:'Aprovacao',label:'Aprovação', countCls:'kanban-count-amber',countQty:0},
+    {key:'Aprovado', label:'Aprovado',  countCls:'kanban-count-blue', countQty:0},
+    {key:'Transito', label:'Em Trânsito',countCls:'kanban-count-purple',countQty:0},
+    {key:'Recebido', label:'Recebido',  countCls:'kanban-count-green',countQty:0}
+  ];
+  cols.forEach(c=>{ c.countQty = MOCK.pedidos.filter(p=>p.status===c.key).length; });
+
+  document.getElementById('kanban-board').innerHTML = cols.map(col=>{
+    const cards = MOCK.pedidos.filter(p=>p.status===col.key).map(p=>`
+      <div class="kanban-card${p.urgente?' kanban-urgent':''}${col.key==='Recebido'?' kanban-done':''}" onclick="toast('Pedido ${p.id} aberto')">
+        ${p.urgente?'<div class="kanban-badge">URGENTE</div>':''}
+        <div class="kanban-id">${p.id}</div>
+        <div class="kanban-title">${p.titulo}</div>
+        <div class="kanban-meta"><span>🏢 ${p.fornecedor}</span><span>${brl(p.valor)}</span></div>
+        ${col.key==='Aprovacao'?`<div class="kanban-approvers"><div class="approver-chip approved">✓ Gerência</div><div class="approver-chip pending">⏳ Diretoria</div></div>`:''}
+        ${col.key==='Transito'?`<div class="tracking-bar"><div class="tracking-step done">Pedido</div><div class="tracking-step done">Enviado</div><div class="tracking-step active">Trânsito</div><div class="tracking-step">Entregue</div></div>`:''}
+      </div>`).join('');
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <span class="kanban-col-title">${col.label}</span>
+        <span class="kanban-count ${col.countCls}">${col.countQty}</span>
+      </div>${cards}
+    </div>`;
+  }).join('');
+}
+
+// ---- RENDER APPROVALS ----
+function renderApprovals() {
+  document.getElementById('approval-list').innerHTML = MOCK.aprovacoes.map(a=>`
+    <div class="approval-item${a.urgente?' urgent':''}">
+      <div style="min-width:70px">
+        <span class="status-badge ${a.urgente?'status-red':'status-amber'}" style="font-size:11px">${a.tipo}</span>
+        <div style="font-family:monospace;font-size:11px;color:var(--text-3);margin-top:4px">${a.id}</div>
+      </div>
+      <div class="approval-info">
+        <div class="approval-title">${a.solicitante} — ${a.fornecedor}</div>
+        <div class="approval-sub">Alçada: ${a.alca} · Prazo: ${a.prazo}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="approval-valor">${brl(a.valor)}</div>
+      </div>
+      <div class="approval-btns">
+        <button class="btn-approve" onclick="toast('${a.id} aprovado! ✓')">Aprovar</button>
+        <button class="btn-reject" onclick="toast('${a.id} rejeitado')">Rejeitar</button>
+      </div>
+    </div>`).join('');
+}
+
+// ---- RENDER CONTRACTS ----
+function renderContracts() {
+  document.getElementById('contract-list').innerHTML = MOCK.contratos.map(c=>`
+    <div class="contract-item${c.status==='Vencendo'?' vencendo':''}">
+      <div class="contract-info">
+        <div class="contract-id">${c.id}</div>
+        <div class="contract-obj">${c.objeto} — ${c.fornecedor}</div>
+        <div class="contract-meta">Vigência: ${c.inicio} → ${c.fim}</div>
+      </div>
+      <span class="status-badge ${c.status==='Vencendo'?'status-amber':'status-green'}">${c.status}</span>
+      <div>
+        <div class="contract-valor">${brl(c.valor)}/ano</div>
+        <div class="contract-periodo">&nbsp;</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="toast('Contrato ${c.id} aberto')">Ver</button>
+    </div>`).join('');
+}
+
+// ---- RENDER NFS ----
+function renderNFs() {
+  const stMap={'Conciliada':'status-green','Vencida':'status-red','Aguardando':'status-amber'};
+  document.getElementById('nf-tbody').innerHTML = MOCK.notasFiscais.map(n=>`
+    <tr>
+      <td class="text-mono">${n.num}</td>
+      <td>${n.fornecedor}</td>
+      <td class="text-mono">${n.pedido}</td>
+      <td style="font-weight:600">${brlFull(n.valor)}</td>
+      <td>${n.emissao}</td>
+      <td><span class="status-badge ${stMap[n.status]}">${n.status}</span></td>
+      <td><span class="${n.matching==='OK'?'match-ok':'match-pend'}">${n.matching==='OK'?'✓ OK':'⚠ Pendente'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="toast('NF ${n.num} aberta')">Ver</button></td>
+    </tr>`).join('');
+}
+
+// ---- RENDER SUPPLIERS ----
+function renderSuppliers() {
+  document.getElementById('supplier-subtitle').textContent = `${MOCK.fornecedores.length} fornecedores · ${MOCK.fornecedores.filter(f=>f.status==='Homologando').length} em homologação`;
+  document.getElementById('supplier-tbody').innerHTML = MOCK.fornecedores.map(s=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td><div class="table-entity">
+        <div class="entity-avatar ${s.cor}">${s.sigla}</div>
+        <div><span class="entity-name">${s.nome}</span><span class="entity-sub">${s.cnpj}</span></div>
+      </div></td>
+      <td class="text-mono" style="font-size:11.5px">${s.cnpj}</td>
+      <td><span class="chip ${s.catClass}">${s.categoria}</span></td>
+      <td><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${s.score*10}%"></div></div><span class="score-num">${s.score}</span></div></td>
+      <td><span class="status-badge ${s.statusClass}">${s.status}</span></td>
+      <td>${s.contratos}</td>
+      <td>${s.ultimo}</td>
+      <td><div class="action-btns">
+        <button class="icon-btn" onclick="toast('Perfil ${s.nome}')"><svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+        <button class="icon-btn" onclick="openModal('rfqModal');toast('RFQ para ${s.nome}')"><svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></button>
+      </div></td>
+    </tr>`).join('');
+  document.getElementById('supplier-info').textContent = `Mostrando ${MOCK.fornecedores.length} de ${MOCK.fornecedores.length} fornecedores`;
+}
+
+// ---- RENDER INTEGRATIONS ----
+function renderIntegrations() {
+  document.getElementById('int-grid').innerHTML = MOCK.integracoes.map(cat=>`
+    <div>
+      <div class="int-category-title">${cat.cat}</div>
+      <div class="int-cards">${cat.itens.map(i=>`
+        <div class="int-card ${i.status==='mock'?'connected':i.status==='pending'?'pending-api':''}">
+          <div class="int-logo ${i.logoClass}">${i.logo}</div>
+          <div class="int-info"><span class="int-name">${i.nome}</span><span class="int-desc">${i.desc}</span></div>
+          ${i.status==='mock'?'<span class="int-tag-mock">Mock ativo</span>':
+            i.status==='pending'?`<span class="int-tag-mock">${i.tag||'Pendente'}</span>`:
+            `<button class="btn btn-secondary btn-sm" onclick="toast('Configure as credenciais para ${i.nome}')">Conectar</button>`}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ---- CHARTS ----
+const chartDefaults = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{display:false}},
+  scales:{
+    x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#8892a8',font:{size:11}}},
+    y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#8892a8',font:{size:11}}}
+  }
+};
+const sparkOpts = {
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{mode:'index'}},
+  scales:{x:{display:false},y:{display:false}},
+  elements:{point:{radius:2,hoverRadius:4}}
+};
+
+let spendChartInst = null;
+function renderCharts(page) {
+  if(page==='dashboard') {
+    const ctx = document.getElementById('spendChart');
+    if(!ctx) return;
+    if(spendChartInst) spendChartInst.destroy();
+    spendChartInst = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels:MOCK.spendMensal.labels,
+        datasets:[
+          {label:'TI & Tecnologia',data:MOCK.spendMensal.ti,      backgroundColor:'rgba(30,58,95,0.8)',  borderRadius:4},
+          {label:'MRO',            data:MOCK.spendMensal.mro,     backgroundColor:'rgba(37,99,168,0.75)',borderRadius:4},
+          {label:'Serviços',       data:MOCK.spendMensal.servicos, backgroundColor:'rgba(96,165,250,0.7)',borderRadius:4},
+          {label:'Logística',      data:MOCK.spendMensal.logistica,backgroundColor:'rgba(186,212,245,0.8)',borderRadius:4}
+        ]
+      },
+      options:{...chartDefaults,plugins:{legend:{position:'right',labels:{color:'#8892a8',font:{size:11},padding:12,boxWidth:12}},tooltip:{mode:'index'}},scales:{...chartDefaults.scales,x:{...chartDefaults.scales.x,stacked:true},y:{...chartDefaults.scales.y,stacked:true,ticks:{callback:v=>'R$'+v+'K',color:'#8892a8',font:{size:11}}}}}
+    });
+  }
+  if(page==='analytics') {
+    const mk = (id,data,color) => {
+      const c = document.getElementById(id); if(!c) return;
+      new Chart(c,{type:'line',data:{labels:MOCK.spendMensal.labels,datasets:[{data,borderColor:color,backgroundColor:color.replace('1)','0.08)'),fill:true,tension:.4,borderWidth:2}]},options:sparkOpts});
+    };
+    mk('savingsChart',   MOCK.spendMensal.ti.map((v,i)=>v+MOCK.spendMensal.mro[i]), 'rgba(22,163,74,1)');
+    mk('leadChart',      [11.2,10.8,10.1,9.5,9.6,8.2], 'rgba(30,58,95,1)');
+    mk('complianceChart',[88,90,91,92,93,94.3],          'rgba(124,58,237,1)');
+    mk('srmChart',       [7.2,7.5,7.6,7.8,7.8,8.1],     'rgba(217,119,6,1)');
+  }
+}
+
+// ---- INIT ALL ----
+renderDashboard();
+renderRequisitions();
+renderRFQ();
+renderKanban();
+renderApprovals();
+renderContracts();
+renderNFs();
+renderSuppliers();
+renderIntegrations();
+showPage('dashboard');
+</script>
+</body>
+</html>
